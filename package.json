@@ -1,6 +1,9 @@
 {
   "author": {
-    "name": ["Gedion Woldeselassie","Tenzin Tsetan"],
+    "name": [
+      "Gedion Woldeselassie",
+      "Tenzin Tsetan"
+    ],
     "email": "gwy321@gmail.com"
   },
   "name": "ep_tables",
@@ -11,7 +14,7 @@
     "url": "git://github.com/gedion/ep_tables.git"
   },
   "scripts": {
-      "prepublish": "./node_modules/.bin/livescript -bc -o static/js src/js"
+    "prepublish": "./node_modules/.bin/livescript -j package.ls > package.tmp &&\nmv package.tmp package.json &&\n./node_modules/.bin/livescript -bc -o static/js src/js"
   },
   "engines": {
     "node": "*"
