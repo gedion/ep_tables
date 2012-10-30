@@ -10,11 +10,16 @@
     "type": "git",
     "url": "git://github.com/gedion/ep_tables.git"
   },
+  "scripts": {
+      "prepublish": "./node_modules/.bin/livescript -bc -o static/js src/js"
+  },
   "engines": {
     "node": "*"
   },
   "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "LiveScript": "1.1.x"
+  },
   "optionalDependencies": {},
   "_id": "ep_tables@0.1.1",
   "_engineSupported": true,
