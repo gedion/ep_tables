@@ -599,7 +599,6 @@ if typeof Datatables is 'undefined'
   Datatables = do ->
     nodeText = (n) ->
       text = []
-      self = arguments_.callee
       el = void
       els = n.childNodes
       excluded = {
@@ -610,7 +609,7 @@ if typeof Datatables is 'undefined'
       iLen = els.length
       while i < iLen
         el = els[i]
-        if el.nodeType is 1 and el.tagName.toLowerCase! of excluded then text.push self el else if el.nodeType is 3 then text.push el.data
+        if el.nodeType is 1 and el.tagName.toLowerCase! of excluded then text.push nodeText el else if el.nodeType is 3 then text.push el.data
         i++
       text.join ''
     dt = {
