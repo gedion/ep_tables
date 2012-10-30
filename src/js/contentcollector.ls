@@ -12,20 +12,18 @@ exports.collectContentLineText = (hook, context) ->
       if n.tagName is 'TD'
         elementName = n.getAttribute 'name'
         if elementName is 'tData'
-          txt = txt.replace //\\//g, '|'
-          txt = txt.replace //"//g, '\''
           break
         else
           if elementName is 'delimCell'
-            txt = '","'
+            txt = '\uF134,\uF134'
             break
           else
             if elementName is 'payload'
-              txt = '{"payload":[["'
+              txt = '{\uF134payload\uF134:[[\uF134'
               break
             else
               if elementName is 'bracketAndcomma'
-                txt = '"]],"tblId":"1","tblClass":"data-tables"}'
+                txt = '\uF134]],\uF134tblId\uF134:\uF1341\uF134,\uF134tblClass\uF134:\uF134data-tables\uF134}'
                 break
       n = n.parentNode
   txt

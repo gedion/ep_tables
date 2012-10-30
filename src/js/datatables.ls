@@ -7,6 +7,21 @@ if not (typeof require is 'undefined')
 exports.aceInitInnerdocbodyHead = (hook_name, args, cb) ->
   args.iframeHTML.push '<link rel="stylesheet" type="text/css" href="/static/plugins/ep_tables/static/css/dataTables.css"/>'
 
+escapedJSON = ->
+  ret = JSON.stringify it
+    .replace /\\(.)/g    (_, _1) -> "\\"+_1.charCodeAt(0)+\;
+    .replace /"/g        '\uF134'
+    .replace /\\(\d+);/g (_, _1) -> "\\"+String.fromCharCode(_1)
+  #console.log ret
+  #console.trace ret
+  ret
+
+fromEscapedJSON = ->
+  ret = JSON.parse it.replace(/(\\|")/g, '\\$1').replace(/\uF134/g, '"')
+  #console.log ret
+  #console.trace \fromEscape
+  ret
+
 exports.postAceInit = (hook, context) ->
   $.createTableMenu = (init) ->
     showTblPropPanel = ->
@@ -623,10 +638,10 @@ if typeof Datatables is 'undefined'
       }}
       config: {}
       vars: {
-        OVERHEAD_LEN_PRE: '{"payload":[["'.length
-        OVERHEAD_LEN_MID: '","'.length
-        OVERHEAD_LEN_ROW_START: '["'.length
-        OVERHEAD_LEN_ROW_END: '"],'.length
+        OVERHEAD_LEN_PRE: '{\uF134payload":[[\uF134'.length
+        OVERHEAD_LEN_MID: '\uF134,\uF134'.length
+        OVERHEAD_LEN_ROW_START: '[\uF134'.length
+        OVERHEAD_LEN_ROW_END: '\uF134],'.length
         JS_KEY_CODE_BS: 8
         JS_KEY_CODE_DEL: 46
         TBL_OPTIONS: [
@@ -703,6 +718,7 @@ if typeof Datatables is 'undefined'
       else
         switch cmd
         case Datatables.vars.TBL_OPTIONS.0
+          console.log xByY
           Datatables.addTable xByY
         case Datatables.vars.TBL_OPTIONS.1
           Datatables.insertTblRow 'addA'
@@ -729,7 +745,7 @@ if typeof Datatables is 'undefined'
         hasMoreRows = tableObj.hasMoreRows
         isRowAddition = tableObj.isRowAddition
       if isRowAddition
-        table = JSON.parse tableObj.tblString
+        table = fromEscapedJSON tableObj.tblString
         insertTblRowBelow 0, table
         performDocApplyTblAttrToRow rep.selStart, JSON.stringify table.tblProperties
         return 
@@ -777,7 +793,8 @@ if typeof Datatables is 'undefined'
       try
         newText = ''
         currLineText = (rep.lines.atIndex rep.selStart.0).text
-        payload = (JSON.parse currLineText).payload
+        payload = (fromEscapedJSON currLineText).payload
+        console.log \zzz, payload
         currTdInfo = @getFocusedTdInfo payload, rep.selStart.1
         currRow = currTdInfo.row
         lastRowOffSet = 0
@@ -841,7 +858,7 @@ if typeof Datatables is 'undefined'
       if props.tblColWidth or props.tblSingleColBgColor or props.tblColVAlign
         currLine = rep.lines.atIndex rep.selStart.0
         currLineText = currLine.text
-        tblJSONObj = JSON.parse currLineText
+        tblJSONObj = fromEscapedJSON currLineText
         payload = tblJSONObj.payload
         currTdInfo = @getFocusedTdInfo payload, rep.selStart.1
         currTd = currTdInfo.td
@@ -920,7 +937,7 @@ if typeof Datatables is 'undefined'
       currLineText = currLine.text
       if (currLineText.indexOf 'data-tables') is -1 then return true
       (try
-        tblJSONObj = JSON.parse currLineText
+        tblJSONObj = fromEscapedJSON currLineText
         tblProperties = @getLineTableProperty start.0
         update = false
         if props.tblWidth or props.tblHeight or props.tblBorderWidth or props.tblBorderColor
@@ -969,7 +986,7 @@ if typeof Datatables is 'undefined'
       currLineText = (rep.lines.atIndex rep.selStart.0).text
       payload = [[]]
       if not numOfRows and numOfRows isnt 0
-        tblPayload = (JSON.parse currLineText).payload
+        tblPayload = (fromEscapedJSON currLineText).payload
         numOfRows = tblPayload.0.length
       tblRows = new Array numOfRows
       if not (numOfRows is 0)
@@ -988,7 +1005,7 @@ if typeof Datatables is 'undefined'
       }
       rep.selEnd.1 = rep.selStart.1 = currLineText.length
       @context.editorInfo.ace_doReturnKey!
-      @context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, JSON.stringify tableObj
+      @context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, escapedJSON tableObj
     dt.createDefaultTblProperties = (authors) ->
       rep = @context.rep
       defTblProp = {
@@ -1032,7 +1049,7 @@ if typeof Datatables is 'undefined'
         rep = context.rep
         currLine = rep.lines.atIndex rep.selStart.0
         currLineText = currLine.text
-        tblJSONObj = JSON.parse currLineText
+        tblJSONObj = fromEscapedJSON currLineText
         payload = tblJSONObj.payload
         currTdInfo = @getFocusedTdInfo payload, rep.selStart.1
         leftOverTdTxtLen = currTdInfo.leftOverTdTxtLen
@@ -1051,7 +1068,7 @@ if typeof Datatables is 'undefined'
           else
             currTd = -1
             rep.selStart.0 = rep.selEnd.0 = rep.selStart.0 + 1
-            tblJSONObj = JSON.parse nextLineText
+            tblJSONObj = fromEscapedJSON nextLineText
             payload = tblJSONObj.payload
             leftOverTdTxtLen = payload.0.0.length
             rep.selEnd.1 = rep.selStart.1 = @vars.OVERHEAD_LEN_PRE + leftOverTdTxtLen
@@ -1116,7 +1133,7 @@ if typeof Datatables is 'undefined'
       func = 'insertTblColumn()'
       try
         currLineText = (rep.lines.atIndex rep.selStart.0).text
-        tblJSONObj = JSON.parse currLineText
+        tblJSONObj = fromEscapedJSON currLineText
         payload = tblJSONObj.payload
         currTdInfo = @getFocusedTdInfo payload, rep.selStart.1
         currTd = currTdInfo.td
@@ -1131,7 +1148,7 @@ if typeof Datatables is 'undefined'
         rep.selEnd.0 = rep.selStart.0 = rep.selStart.0 - numOfLinesAbove
         while rep.selStart.0 < rep.lines.length! and ((rep.lines.atIndex rep.selStart.0).text.indexOf 'data-tables') isnt -1
           currLineText = (rep.lines.atIndex rep.selStart.0).text
-          tblJSONObj = JSON.parse currLineText
+          tblJSONObj = fromEscapedJSON currLineText
           payload = tblJSONObj.payload
           cellPos = (@getTdInfo payload, currTd).cellEndOffset
           newText = '" ",'
@@ -1160,7 +1177,7 @@ if typeof Datatables is 'undefined'
       rep = @context.rep
       try
         currLineText = (rep.lines.atIndex rep.selStart.0).text
-        tblJSONObj = JSON.parse currLineText
+        tblJSONObj = fromEscapedJSON currLineText
         payload = tblJSONObj.payload
         deleteTable! if payload.0.length is 1
         currTdInfo = @getFocusedTdInfo payload, rep.selStart.1
@@ -1175,7 +1192,7 @@ if typeof Datatables is 'undefined'
         rep.selEnd.0 = rep.selStart.0 = rep.selStart.0 - numOfLinesAbove
         while rep.selStart.0 < rep.lines.length! and ((rep.lines.atIndex rep.selStart.0).text.indexOf 'data-tables') isnt -1
           currLineText = (rep.lines.atIndex rep.selStart.0).text
-          tblJSONObj = JSON.parse currLineText
+          tblJSONObj = fromEscapedJSON currLineText
           payload = tblJSONObj.payload
           cellTdInfo = @getTdInfo payload, currTd
           newText = '" ",'
@@ -1204,7 +1221,7 @@ if typeof Datatables is 'undefined'
       currLineText = (rep.lines.atIndex rep.selStart.0).text
       payload = [[]]
       if not numOfRows and numOfRows isnt 0
-        tblPayload = (JSON.parse currLineText).payload
+        tblPayload = (fromEscapedJSON currLineText).payload
         numOfRows = tblPayload.0.length
       tblRows = new Array numOfRows
       if not (numOfRows is 0)
@@ -1223,7 +1240,7 @@ if typeof Datatables is 'undefined'
       }
       rep.selEnd.1 = rep.selStart.1 = currLineText.length
       @context.editorInfo.ace_inCallStackIfNecessary 'newline', @context.editorInfo.ace_doReturnKey
-      context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, JSON.stringify tableObj
+      context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, escapedJSON tableObj
     dt.doReturnKey = ->
       context = @context
       rep = context.rep
@@ -1249,8 +1266,8 @@ if typeof Datatables is 'undefined'
           start.1 = currCarretPos
           end.1 = currCarretPos
           (try
-            jsonObj = JSON.parse (currLineText.substring 0, start.1) + newText + currLineText.substring start.1
-            payloadStr = JSON.stringify jsonObj.payload
+            jsonObj = fromEscapedJSON (currLineText.substring 0, start.1) + newText + currLineText.substring start.1
+            payloadStr = escapedJSON jsonObj.payload
             return true if currCarretPos > payloadStr.length + @vars.OVERHEAD_LEN_PRE - 2
           catch error
             return true)
@@ -1267,7 +1284,7 @@ if typeof Datatables is 'undefined'
       return true if (currLineText.indexOf 'data-tables') is -1
       isDeleteAccepted = false
       (try
-        tblJSONObj = JSON.parse currLineText
+        tblJSONObj = fromEscapedJSON currLineText
         table = tblJSONObj.payload
         currTdInfo = @getFocusedTdInfo table, rep.selStart.1
         cellEntryLen = table[currTdInfo.row][currTdInfo.td].length

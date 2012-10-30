@@ -56,7 +56,7 @@ if typeof DatatablesRenderer is 'undefined'
           rowBgColor = evenRowBgColor if not rowBgColor
           htmlTbl += '<tr style=\'vertical-align:' + rowVAlign + ';background-color:' + rowBgColor + '; ' + borders + '!important;\' class=\'' + trClass + '\'>'
           preHeader = ''
-          if j is 0 then preHeader = '{"payload":[["'
+          if j is 0 then preHeader = '{\uF134payload\uF134:[[\uF134'
           htmlTbl += '<td  name=\'payload\' class=\'hide-el overhead\'>' + preHeader + '</td>'
           singleRowAttr = if typeof singleRowAttrs is 'undefined' or not singleRowAttrs? then null else singleRowAttrs[j]
           i = 0
@@ -68,7 +68,7 @@ if typeof DatatablesRenderer is 'undefined'
             borderTop = ''
             borderTop = ' border-top: 0px solid white !important;' if tblBorderWidth is 0
             colVAlign = if typeof colAttrs[i] is 'undefined' or not colAttrs[i]? then '' else 'align=\'' + colAttrs[i].colVAlign + '\'' or ''
-            quoteAndComma = '","'
+            quoteAndComma = '\uF134,\uF134'
             cellDel = ''
             delimCell = '<td name=\'delimCell\' id=\'' + '\' class=\'hide-el overhead\'>' + quoteAndComma + '</td>'
             lastCellBorder = ''
@@ -90,7 +90,7 @@ if typeof DatatablesRenderer is 'undefined'
             else
               htmlTbl += '<td name=\'tData\' ' + colVAlign + ' style=\'' + printViewTblTDStyles + cellStyles + lastCellBorder + ' border-left:' + tblBorderWidth + 'px solid ' + tblBorderColor + authorBorderColor + borderTop + '\' >' + tds[i] + '' + '<br value=\'tblBreak\'></td>' + delimCell
             i++
-          bracketAndcomma = '"]],"tblId":"1","tblClass":"data-tables"}'
+          bracketAndcomma = '\uF134]],\uF134tblId\uF134:\uF1341\uF134,\uF134tblClass\uF134:\uF134data-tables\uF134}'
           htmlTbl += '<td name=\'bracketAndcomma\' class=\'  hide-el overhead\'>' + bracketAndcomma + '</td>'
           htmlTbl += '</tr>'
           j++
@@ -144,7 +144,7 @@ if typeof DatatablesRenderer is 'undefined'
         JSONCode = ''
         html = ''
         try
-          JSONCode = JSON.parse code
+          JSONCode = JSON.parse code.replace(/(\\|")/g, '\\$1').replace(/\uF134/g, '"')
           html = @buildTabularData JSONCode, attributes
         catch
         html

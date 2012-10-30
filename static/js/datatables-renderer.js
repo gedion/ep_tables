@@ -87,7 +87,7 @@ if (typeof DatatablesRenderer === 'undefined') {
           htmlTbl += '<tr style=\'vertical-align:' + rowVAlign + ';background-color:' + rowBgColor + '; ' + borders + '!important;\' class=\'' + trClass + '\'>';
           preHeader = '';
           if (j === 0) {
-            preHeader = '{"payload":[["';
+            preHeader = '{\uF134payload\uF134:[[\uF134';
           }
           htmlTbl += '<td  name=\'payload\' class=\'hide-el overhead\'>' + preHeader + '</td>';
           singleRowAttr = typeof singleRowAttrs === 'undefined' || singleRowAttrs == null
@@ -108,7 +108,7 @@ if (typeof DatatablesRenderer === 'undefined') {
             colVAlign = typeof colAttrs[i] === 'undefined' || colAttrs[i] == null
               ? ''
               : 'align=\'' + colAttrs[i].colVAlign + '\'' || '';
-            quoteAndComma = '","';
+            quoteAndComma = '\uF134,\uF134';
             cellDel = '';
             delimCell = '<td name=\'delimCell\' id=\'' + '\' class=\'hide-el overhead\'>' + quoteAndComma + '</td>';
             lastCellBorder = '';
@@ -135,7 +135,7 @@ if (typeof DatatablesRenderer === 'undefined') {
             }
             i++;
           }
-          bracketAndcomma = '"]],"tblId":"1","tblClass":"data-tables"}';
+          bracketAndcomma = '\uF134]],\uF134tblId\uF134:\uF1341\uF134,\uF134tblClass\uF134:\uF134data-tables\uF134}';
           htmlTbl += '<td name=\'bracketAndcomma\' class=\'  hide-el overhead\'>' + bracketAndcomma + '</td>';
           htmlTbl += '</tr>';
           j++;
@@ -232,7 +232,7 @@ if (typeof DatatablesRenderer === 'undefined') {
         JSONCode = '';
         html = '';
         try {
-          JSONCode = JSON.parse(code);
+          JSONCode = JSON.parse(code.replace(/(\\|")/g, '\\$1').replace(/\uF134/g, '"'));
           html = this.buildTabularData(JSONCode, attributes);
         } catch (e$) {
           e = e$;
