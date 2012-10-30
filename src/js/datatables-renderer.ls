@@ -1,11 +1,12 @@
-if typeof DatatablesRenderer is 'undefined'
-  DatatablesRenderer = do ->
-    dRenderer = {render: (params, element, attributes) ->
-      renderer = new DatatablesRenderer.Renderer
-      if element.innerText then code = element.innerText else code = element.textContent
-      element.innerHTML = renderer.getHtml code, attributes}
-    dRenderer.Renderer = ->
-    dRenderer.Renderer.prototype = {
+DatatablesRenderer = {}
+class DatatablesRenderer
+  @render = (params, element, attributes) ->
+    renderer = new DatatablesRenderer.Renderer
+    if element.innerText then code = element.innerText else code = element.textContent
+    element.innerHTML = renderer.getHtml code, attributes
+
+  class @Renderer
+      ->
       createDefaultTblProperties: (authors) ->
         {
           borderWidth: '1'
@@ -148,7 +149,5 @@ if typeof DatatablesRenderer is 'undefined'
           html = @buildTabularData JSONCode, attributes
         catch
         html
-    }
-    dRenderer
 
-if typeof exports isnt 'undefined' then exports.DatatablesRenderer = DatatablesRenderer else null
+exports?DatatablesRenderer = DatatablesRenderer
