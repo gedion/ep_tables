@@ -9,7 +9,11 @@ exports.aceInitInnerdocbodyHead = (hook_name, args, cb) ->
 
 escapedJSON = ->
   ret = JSON.stringify it
-    .replace /\\(.)/g    (_, _1) -> "\\"+_1.charCodeAt(0)+\;
+    .replace /\\u(....)|\\(.)/g    (_, _1, _2) ->
+        if _1
+          String.fromCharCode parseInt _1, 16
+        else
+          "\\"+_1.charCodeAt(0)+\;
     .replace /"/g        '\uF134'
     .replace /\\(\d+);/g (_, _1) -> "\\"+String.fromCharCode(_1)
   #console.log ret
@@ -539,7 +543,7 @@ exports.acePostWriteDomLineHTML = (hook_name, args, cb) ->
     continue if (args.node.children[i].className.indexOf 'list') isnt -1 or (args.node.children[i].className.indexOf 'tag') isnt -1 or (args.node.children[i].className.indexOf 'url') isnt -1
     lineText = ''
     if args.node.children[i].innerText then lineText = args.node.children[i].innerText else lineText = args.node.children[i].textContent
-    if lineText and (lineText.indexOf 'data-tables') isnt -1
+    if lineText and (lineText.indexOf '\uFFF9') isnt -1
       dtAttrs = if typeof exports.Datatables isnt 'undefined' then exports.Datatables.attributes else null
       dtAttrs = dtAttrs or ''
       DatatablesRenderer.render {}, args.node.children[i], dtAttrs
@@ -663,7 +667,7 @@ if typeof Datatables is 'undefined'
       line = @context.rep.lines.atIndex @context.rep.selStart.0
       if not line then return false
       currLineText = line.text or ''
-      if (currLineText.indexOf 'data-tables') is -1 then return false
+      if (currLineText.indexOf '\uFFF9') is -1 then return false
       true
     dt._getRowEndOffset = (rowStartOffset, tds) ->
       rowEndOffset = rowStartOffset + @vars.OVERHEAD_LEN_ROW_START
@@ -718,7 +722,6 @@ if typeof Datatables is 'undefined'
       else
         switch cmd
         case Datatables.vars.TBL_OPTIONS.0
-          console.log xByY
           Datatables.addTable xByY
         case Datatables.vars.TBL_OPTIONS.1
           Datatables.insertTblRow 'addA'
@@ -751,11 +754,11 @@ if typeof Datatables is 'undefined'
         return 
       if line
         currLineText = line.text
-        if not ((currLineText.indexOf 'data-tables') is -1)
+        if not ((currLineText.indexOf '\uFFF9') is -1)
           while true
             rep.selStart.0 = rep.selStart.0 + 1
             currLineText = (rep.lines.atIndex rep.selStart.0).text
-            break if not ((currLineText.indexOf 'data-tables') isnt -1)
+            break if not ((currLineText.indexOf '\uFFF9') isnt -1)
           rep.selEnd.1 = rep.selStart.1 = currLineText.length
           @context.editorInfo.ace_doReturnKey!
           @context.editorInfo.ace_doReturnKey!
@@ -794,7 +797,6 @@ if typeof Datatables is 'undefined'
         newText = ''
         currLineText = (rep.lines.atIndex rep.selStart.0).text
         payload = (fromEscapedJSON currLineText).payload
-        console.log \zzz, payload
         currTdInfo = @getFocusedTdInfo payload, rep.selStart.1
         currRow = currTdInfo.row
         lastRowOffSet = 0
@@ -823,11 +825,11 @@ if typeof Datatables is 'undefined'
         line = rep.selStart.0 - 1
         numOfLinesAbove = 0
         numOfLinesBelow = 0
-        while not (((rep.lines.atIndex line).text.indexOf 'data-tables') is -1)
+        while not (((rep.lines.atIndex line).text.indexOf '\uFFF9') is -1)
           numOfLinesAbove++
           line--
         line = rep.selEnd.0 + 1
-        while not (((rep.lines.atIndex line).text.indexOf 'data-tables') is -1)
+        while not (((rep.lines.atIndex line).text.indexOf '\uFFF9') is -1)
           numOfLinesBelow++
           line++
         rep.selStart.1 = 0
@@ -841,13 +843,13 @@ if typeof Datatables is 'undefined'
       rep = @context.rep
       try
         currLineText = (rep.lines.atIndex rep.selStart.0).text
-        return  if (currLineText.indexOf 'data-tables') is -1
+        return  if (currLineText.indexOf '\uFFF9') is -1
         rep.selEnd.0 = rep.selStart.0 + 1
         rep.selStart.1 = 0
         rep.selEnd.1 = 0
         @context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, ''
         currLineText = (rep.lines.atIndex rep.selStart.0).text
-        if (currLineText.indexOf 'data-tables') is -1 then return 
+        if (currLineText.indexOf '\uFFF9') is -1 then return 
         @updateAuthorAndCaretPos rep.selStart.0, 0, 0
         updateEvenOddBgColor = true
         @sanitizeTblProperties rep.selStart, updateEvenOddBgColor
@@ -870,7 +872,7 @@ if typeof Datatables is 'undefined'
         tempStart = []
         tempStart.0 = start.0 - numOfLinesAbove
         tempStart.1 = start.1
-        while tempStart.0 < rep.lines.length! and ((rep.lines.atIndex tempStart.0).text.indexOf 'data-tables') isnt -1
+        while tempStart.0 < rep.lines.length! and ((rep.lines.atIndex tempStart.0).text.indexOf '\uFFF9') isnt -1
           if props.tblEvenRowBgColor and tempStart.0 % 2 isnt 0
             tempStart.0 = tempStart.0 + 1
             continue
@@ -935,7 +937,7 @@ if typeof Datatables is 'undefined'
       return  if not start
       currLine = rep.lines.atIndex start.0
       currLineText = currLine.text
-      if (currLineText.indexOf 'data-tables') is -1 then return true
+      if (currLineText.indexOf '\uFFF9') is -1 then return true
       (try
         tblJSONObj = fromEscapedJSON currLineText
         tblProperties = @getLineTableProperty start.0
@@ -999,7 +1001,7 @@ if typeof Datatables is 'undefined'
       tableObj = {
         payload: payload
         tblId: 1
-        tblClass: 'data-tables'
+        tblClass: '\uFFF9'
         trClass: 'alst'
         tdClass: 'hide-el'
       }
@@ -1021,12 +1023,12 @@ if typeof Datatables is 'undefined'
       jsoTblProp = null
       if prevLine
         prevLineText = prevLine.text
-        jsoTblProp = @getLineTableProperty rep.selStart.0 - 1 if not ((prevLineText.indexOf 'data-tables') is -1)
+        jsoTblProp = @getLineTableProperty rep.selStart.0 - 1 if not ((prevLineText.indexOf '\uFFF9') is -1)
       if not jsoTblProp
         nextLine = rep.lines.atIndex rep.selEnd.0 - 1
         if nextLine
           nextLineText = nextLine.text
-          jsoTblProp = @getLineTableProperty rep.selStart.0 + 1 if not ((nextLineText.indexOf 'data-tables') is -1)
+          jsoTblProp = @getLineTableProperty rep.selStart.0 + 1 if not ((nextLineText.indexOf '\uFFF9') is -1)
       if jsoTblProp
         defTblProp.borderWidth = jsoTblProp.borderWidth
         defTblProp.borderColor = jsoTblProp.borderColor
@@ -1060,7 +1062,7 @@ if typeof Datatables is 'undefined'
           nextLine = rep.lines.atIndex rep.selStart.0 + 1
           nextLineText = nextLine.text
           updateEvenOddBgColor = false
-          if not nextLineText? or nextLineText is '' or (nextLineText.indexOf 'data-tables') is -1
+          if not nextLineText? or nextLineText is '' or (nextLineText.indexOf '\uFFF9') is -1
             @insertTblRowBelow null, null
             @performDocApplyTblAttrToRow rep.selStart, @createDefaultTblProperties!
             rep.selEnd.1 = rep.selStart.1 = @vars.OVERHEAD_LEN_PRE
@@ -1146,7 +1148,7 @@ if typeof Datatables is 'undefined'
         currTd -= 1 if leftOrRight is 'addL'
         numOfLinesAbove = @getTblAboveRowsFromCurFocus start
         rep.selEnd.0 = rep.selStart.0 = rep.selStart.0 - numOfLinesAbove
-        while rep.selStart.0 < rep.lines.length! and ((rep.lines.atIndex rep.selStart.0).text.indexOf 'data-tables') isnt -1
+        while rep.selStart.0 < rep.lines.length! and ((rep.lines.atIndex rep.selStart.0).text.indexOf '\uFFF9') isnt -1
           currLineText = (rep.lines.atIndex rep.selStart.0).text
           tblJSONObj = fromEscapedJSON currLineText
           payload = tblJSONObj.payload
@@ -1190,7 +1192,7 @@ if typeof Datatables is 'undefined'
         end.1 = rep.selEnd.1
         numOfLinesAbove = @getTblAboveRowsFromCurFocus start
         rep.selEnd.0 = rep.selStart.0 = rep.selStart.0 - numOfLinesAbove
-        while rep.selStart.0 < rep.lines.length! and ((rep.lines.atIndex rep.selStart.0).text.indexOf 'data-tables') isnt -1
+        while rep.selStart.0 < rep.lines.length! and ((rep.lines.atIndex rep.selStart.0).text.indexOf '\uFFF9') isnt -1
           currLineText = (rep.lines.atIndex rep.selStart.0).text
           tblJSONObj = fromEscapedJSON currLineText
           payload = tblJSONObj.payload
@@ -1234,7 +1236,7 @@ if typeof Datatables is 'undefined'
       tableObj = {
         payload: payload
         tblId: 1
-        tblClass: 'data-tables'
+        tblClass: '\uFFF9'
         trClass: 'alst'
         tdClass: 'hide-el'
       }
@@ -1249,7 +1251,7 @@ if typeof Datatables is 'undefined'
       lastTblPropertyUsed = 'doTableReturnKey'
       currLine = rep.lines.atIndex rep.selStart.0
       currLineText = currLine.text
-      if not ((currLineText.indexOf 'data-tables') is -1)
+      if not ((currLineText.indexOf '\uFFF9') is -1)
         func = 'doTableReturnKey()'
         try
           currCarretPos = rep.selStart.1
@@ -1281,7 +1283,7 @@ if typeof Datatables is 'undefined'
       end = rep.selEnd
       currLine = rep.lines.atIndex rep.selStart.0
       currLineText = currLine.text
-      return true if (currLineText.indexOf 'data-tables') is -1
+      return true if (currLineText.indexOf '\uFFF9') is -1
       isDeleteAccepted = false
       (try
         tblJSONObj = fromEscapedJSON currLineText
@@ -1438,7 +1440,7 @@ if typeof Datatables is 'undefined'
       rep = @context.rep
       numOfLinesAbove = 0
       line = start.0 - 1
-      while not (((rep.lines.atIndex line).text.indexOf 'data-tables') is -1)
+      while not (((rep.lines.atIndex line).text.indexOf '\uFFF9') is -1)
         numOfLinesAbove++
         line--
       numOfLinesAbove
@@ -1462,7 +1464,7 @@ if typeof Datatables is 'undefined'
       tempStart.0 = start.0 - numOfLinesAbove
       evenOddRowBgColors = {}
       updateEvenOddBgColor
-      while tempStart.0 < rep.lines.length! and ((rep.lines.atIndex tempStart.0).text.indexOf 'data-tables') isnt -1
+      while tempStart.0 < rep.lines.length! and ((rep.lines.atIndex tempStart.0).text.indexOf '\uFFF9') isnt -1
         jsoTblProp = @getLineTableProperty tempStart.0
         update = false
         if tempStart.0 isnt start.0 and jsoTblProp.'authors' and jsoTblProp.'authors'[thisAuthor]

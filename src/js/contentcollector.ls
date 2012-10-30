@@ -23,7 +23,7 @@ exports.collectContentLineText = (hook, context) ->
               break
             else
               if elementName is 'bracketAndcomma'
-                txt = '\uF134]],\uF134tblId\uF134:\uF1341\uF134,\uF134tblClass\uF134:\uF134data-tables\uF134}'
+                txt = '\uF134]],\uF134tblId\uF134:\uF1341\uF134,\uF134tblClass\uF134:\uF134\uFFF9\uF134}'
                 break
       n = n.parentNode
   txt
