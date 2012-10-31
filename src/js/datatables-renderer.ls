@@ -1,8 +1,7 @@
 DatatablesRenderer = {}
 class DatatablesRenderer
-  @render = (params, element, attributes) ->
+  @render = (params, element, code, attributes) ->
     renderer = new DatatablesRenderer.Renderer
-    if element.innerText then code = element.innerText else code = element.textContent
     element.innerHTML = renderer.getHtml code, attributes
 
   class @Renderer
@@ -141,11 +140,9 @@ class DatatablesRenderer
         intAttrValue = parseFloat attrValue
         attrValue = if isNaN intAttrValue then parseFloat attrValue else intAttrValue
         96 * attrValue - 1
-      getHtml: (code, attributes) ->
-        JSONCode = ''
+      getHtml: (JSONCode, attributes) ->
         html = ''
         try
-          JSONCode = JSON.parse code.replace(/(\\|")/g, '\\$1').replace(/\uF134/g, '"')
           html = @buildTabularData JSONCode, attributes
         catch
         html

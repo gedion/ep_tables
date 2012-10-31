@@ -31,24 +31,24 @@ exports.aceInitialized = function(hook, context){
   editorInfo = context.editorInfo;
   return editorInfo.ace_doDatatableOptions = _(Datatables.doDatatableOptions).bind(context);
 };
-exports.acePostWriteDomLineHTML = function(hook_name, args, cb){
-  var children, i, lineText, dtAttrs, results$ = [];
-  children = args.node.children;
+exports.acePostWriteDomLineHTML = function(hook_name, arg$, cb){
+  var node, children, i, element, lineText, ref$, dtAttrs, code, results$ = [];
+  node = arg$.node;
+  children = node.children;
   i = 0;
   while (i < children.length) {
-    if (args.node.children[i].className.indexOf('list') !== -1 || args.node.children[i].className.indexOf('tag') !== -1 || args.node.children[i].className.indexOf('url') !== -1) {
+    element = children[i];
+    if (element.className.indexOf('list') !== -1 || element.className.indexOf('tag') !== -1 || element.className.indexOf('url') !== -1) {
       continue;
     }
-    lineText = '';
-    if (args.node.children[i].innerText) {
-      lineText = args.node.children[i].innerText;
-    } else {
-      lineText = args.node.children[i].textContent;
-    }
+    lineText = (ref$ = element.innerText) != null
+      ? ref$
+      : element.textContent;
     if (lineText && lineText.indexOf('\uFFF9') !== -1) {
       dtAttrs = typeof exports.Datatables !== 'undefined' ? exports.Datatables.attributes : null;
       dtAttrs = dtAttrs || '';
-      DatatablesRenderer.render({}, args.node.children[i], dtAttrs);
+      code = fromEscapedJSON(lineText);
+      DatatablesRenderer.render({}, element, code, dtAttrs);
       exports.Datatables.attributes = null;
     }
     results$.push(i++);

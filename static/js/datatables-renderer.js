@@ -3,14 +3,9 @@ DatatablesRenderer = {};
 DatatablesRenderer = (function(){
   DatatablesRenderer.displayName = 'DatatablesRenderer';
   var Renderer, prototype = DatatablesRenderer.prototype, constructor = DatatablesRenderer;
-  DatatablesRenderer.render = function(params, element, attributes){
-    var renderer, code;
+  DatatablesRenderer.render = function(params, element, code, attributes){
+    var renderer;
     renderer = new DatatablesRenderer.Renderer;
-    if (element.innerText) {
-      code = element.innerText;
-    } else {
-      code = element.textContent;
-    }
     return element.innerHTML = renderer.getHtml(code, attributes);
   };
   DatatablesRenderer.Renderer = Renderer = (function(){
@@ -228,12 +223,10 @@ DatatablesRenderer = (function(){
       attrValue = isNaN(intAttrValue) ? parseFloat(attrValue) : intAttrValue;
       return 96 * attrValue - 1;
     };
-    prototype.getHtml = function(code, attributes){
-      var JSONCode, html, e;
-      JSONCode = '';
+    prototype.getHtml = function(JSONCode, attributes){
+      var html, e;
       html = '';
       try {
-        JSONCode = JSON.parse(code.replace(/(\\|")/g, '\\$1').replace(/\uF134/g, '"'));
         html = this.buildTabularData(JSONCode, attributes);
       } catch (e$) {
         e = e$;

@@ -27,17 +27,18 @@ exports.aceInitialized = (hook, context) ->
   editorInfo = context.editorInfo
   editorInfo.ace_doDatatableOptions = (_ Datatables.doDatatableOptions).bind context
 
-exports.acePostWriteDomLineHTML = (hook_name, args, cb) ->
-  children = args.node.children
+exports.acePostWriteDomLineHTML = (hook_name, {node}, cb) ->
+  children = node.children
   i = 0
   while i < children.length
-    continue if (args.node.children[i].className.indexOf 'list') isnt -1 or (args.node.children[i].className.indexOf 'tag') isnt -1 or (args.node.children[i].className.indexOf 'url') isnt -1
-    lineText = ''
-    if args.node.children[i].innerText then lineText = args.node.children[i].innerText else lineText = args.node.children[i].textContent
+    element = children[i]
+    continue if (element.className.indexOf 'list') isnt -1 or (element.className.indexOf 'tag') isnt -1 or (element.className.indexOf 'url') isnt -1
+    lineText = element.innerText ? element.textContent
     if lineText and (lineText.indexOf '\uFFF9') isnt -1
       dtAttrs = if typeof exports.Datatables isnt 'undefined' then exports.Datatables.attributes else null
       dtAttrs = dtAttrs or ''
-      DatatablesRenderer.render {}, args.node.children[i], dtAttrs
+      code = fromEscapedJSON lineText
+      DatatablesRenderer.render {}, element, code, dtAttrs
       exports.Datatables.attributes = null
     i++
 
