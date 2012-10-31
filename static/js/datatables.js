@@ -37,7 +37,7 @@ exports.acePostWriteDomLineHTML = function(hook_name, arg$, cb){
   children = node.children;
   i = 0;
   while (i < children.length) {
-    element = children[i];
+    element = children[i++];
     if (element.className.indexOf('list') !== -1 || element.className.indexOf('tag') !== -1 || element.className.indexOf('url') !== -1) {
       continue;
     }
@@ -49,9 +49,8 @@ exports.acePostWriteDomLineHTML = function(hook_name, arg$, cb){
       dtAttrs = dtAttrs || '';
       code = fromEscapedJSON(lineText);
       DatatablesRenderer.render({}, element, code, dtAttrs);
-      exports.Datatables.attributes = null;
+      results$.push(exports.Datatables.attributes = null);
     }
-    results$.push(i++);
   }
   return results$;
 };
