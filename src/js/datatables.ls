@@ -118,7 +118,10 @@ class Datatables
       iLen = els.length
       while i < iLen
         el = els[i]
-        if el.nodeType is 1 and el.tagName.toLowerCase! of excluded then text.push nodeText el else if el.nodeType is 3 then text.push el.data
+        if el.nodeType is 1 and !(el.tagName.toLowerCase! of excluded)
+          text.push nodeText el
+        else if el.nodeType is 3
+          text.push el.data
         i++
       text.join ''
     @defaults= {tblProps: {

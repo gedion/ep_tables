@@ -158,7 +158,7 @@ Datatables = (function(){
     iLen = els.length;
     while (i < iLen) {
       el = els[i];
-      if (el.nodeType === 1 && el.tagName.toLowerCase() in excluded) {
+      if (el.nodeType === 1 && !(el.tagName.toLowerCase() in excluded)) {
         text.push(nodeText(el));
       } else if (el.nodeType === 3) {
         text.push(el.data);
