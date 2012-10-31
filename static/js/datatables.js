@@ -180,7 +180,7 @@ Datatables = (function(){
   };
   Datatables.config = {};
   Datatables.vars = {
-    OVERHEAD_LEN_PRE: '{\uF134payload":[[\uF134'.length,
+    OVERHEAD_LEN_PRE: '{\uF134payload\uF134:[[\uF134'.length,
     OVERHEAD_LEN_MID: '\uF134,\uF134'.length,
     OVERHEAD_LEN_ROW_START: '[\uF134'.length,
     OVERHEAD_LEN_ROW_END: '\uF134],'.length,
@@ -854,10 +854,10 @@ Datatables = (function(){
         tblJSONObj = fromEscapedJSON(currLineText);
         payload = tblJSONObj.payload;
         cellPos = this.getTdInfo(payload, currTd).cellEndOffset;
-        newText = '" ",';
+        newText = '\uF134 \uF134,';
         if (currTd === payload[0].length - 1) {
           rep.selStart[1] = rep.selEnd[1] = cellPos - this.vars.OVERHEAD_LEN_ROW_END + 1;
-          newText = '," "';
+          newText = ',\uF134 \uF134';
         } else {
           if (currTd === -1) {
             rep.selStart[1] = rep.selEnd[1] = this.vars.OVERHEAD_LEN_PRE - 1;
@@ -911,7 +911,7 @@ Datatables = (function(){
         tblJSONObj = fromEscapedJSON(currLineText);
         payload = tblJSONObj.payload;
         cellTdInfo = this.getTdInfo(payload, currTd);
-        newText = '" ",';
+        newText = '\uF134 \uF134,';
         if (currTd === payload[0].length - 1) {
           rep.selStart[1] = cellTdInfo.cellStartOffset - 2;
           rep.selEnd[1] = cellTdInfo.cellEndOffset - 2;
@@ -983,10 +983,10 @@ Datatables = (function(){
       func = 'doTableReturnKey()';
       try {
         currCarretPos = rep.selStart[1];
-        if (currLineText.substring(currCarretPos - 1, currCarretPos + 2) === '","') {
+        if (currLineText.substring(currCarretPos - 1, currCarretPos + 2) === '\uF134,\uF134') {
           return true;
         } else {
-          if (currLineText.substring(currCarretPos - 2, currCarretPos + 1) === '","') {
+          if (currLineText.substring(currCarretPos - 2, currCarretPos + 1) === '\uF134,\uF134') {
             return true;
           } else {
             if (currCarretPos < this.vars.OVERHEAD_LEN_PRE) {
@@ -1036,10 +1036,10 @@ Datatables = (function(){
       currTdInfo = this.getFocusedTdInfo(table, rep.selStart[1]);
       cellEntryLen = table[currTdInfo.row][currTdInfo.td].length;
       currCarretPos = rep.selStart[1];
-      if (currLineText.substring(currCarretPos - 1, currCarretPos + 2) === '","') {
+      if (currLineText.substring(currCarretPos - 1, currCarretPos + 2) === '\uF134,\uF134') {
         return false;
       } else {
-        if (currLineText.substring(currCarretPos - 2, currCarretPos + 1) === '","') {
+        if (currLineText.substring(currCarretPos - 2, currCarretPos + 1) === '\uF134,\uF134') {
           return false;
         }
       }

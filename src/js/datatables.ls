@@ -131,7 +131,7 @@ class Datatables
     }}
     @config= {}
     @vars= {
-        OVERHEAD_LEN_PRE: '{\uF134payload":[[\uF134'.length
+        OVERHEAD_LEN_PRE: '{\uF134payload\uF134:[[\uF134'.length
         OVERHEAD_LEN_MID: '\uF134,\uF134'.length
         OVERHEAD_LEN_ROW_START: '[\uF134'.length
         OVERHEAD_LEN_ROW_END: '\uF134],'.length
@@ -641,10 +641,10 @@ class Datatables
           tblJSONObj = fromEscapedJSON currLineText
           payload = tblJSONObj.payload
           cellPos = (@getTdInfo payload, currTd).cellEndOffset
-          newText = '" ",'
+          newText = '\uF134 \uF134,'
           if currTd is payload.0.length - 1
             rep.selStart.1 = rep.selEnd.1 = cellPos - @vars.OVERHEAD_LEN_ROW_END + 1
-            newText = '," "'
+            newText = ',\uF134 \uF134'
           else
             if currTd is -1 then rep.selStart.1 = rep.selEnd.1 = @vars.OVERHEAD_LEN_PRE - 1 else rep.selStart.1 = rep.selEnd.1 = cellPos - 1
           @context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, newText
@@ -685,7 +685,7 @@ class Datatables
           tblJSONObj = fromEscapedJSON currLineText
           payload = tblJSONObj.payload
           cellTdInfo = @getTdInfo payload, currTd
-          newText = '" ",'
+          newText = '\uF134 \uF134,'
           if currTd is payload.0.length - 1
             rep.selStart.1 = cellTdInfo.cellStartOffset - 2
             rep.selEnd.1 = cellTdInfo.cellEndOffset - 2
@@ -743,10 +743,10 @@ class Datatables
         func = 'doTableReturnKey()'
         try
           currCarretPos = rep.selStart.1
-          if (currLineText.substring currCarretPos - 1, currCarretPos + 2) is '","'
+          if (currLineText.substring currCarretPos - 1, currCarretPos + 2) is '\uF134,\uF134'
             return true
           else
-            if (currLineText.substring currCarretPos - 2, currCarretPos + 1) is '","'
+            if (currLineText.substring currCarretPos - 2, currCarretPos + 1) is '\uF134,\uF134'
               return true
             else
               if currCarretPos < @vars.OVERHEAD_LEN_PRE then return true else if currCarretPos > currLineText.length then return true
@@ -779,10 +779,10 @@ class Datatables
         currTdInfo = @getFocusedTdInfo table, rep.selStart.1
         cellEntryLen = table[currTdInfo.row][currTdInfo.td].length
         currCarretPos = rep.selStart.1
-        if (currLineText.substring currCarretPos - 1, currCarretPos + 2) is '","'
+        if (currLineText.substring currCarretPos - 1, currCarretPos + 2) is '\uF134,\uF134'
           return false
         else
-          if (currLineText.substring currCarretPos - 2, currCarretPos + 1) is '","' then return false
+          if (currLineText.substring currCarretPos - 2, currCarretPos + 1) is '\uF134,\uF134' then return false
         switch keyCode
         case @vars.JS_KEY_CODE_BS
           isDeleteAccepted = true if cellEntryLen isnt 0 and cellEntryLen > currTdInfo.leftOverTdTxtLen - @vars.OVERHEAD_LEN_MID
