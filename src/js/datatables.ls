@@ -105,8 +105,7 @@ exports.aceKeyEvent = (hook, context) ->
   catch
   specialHandled
 
-if typeof Datatables is 'undefined'
-  Datatables = do ->
+class Datatables
     nodeText = (n) ->
       text = []
       el = void
@@ -122,17 +121,16 @@ if typeof Datatables is 'undefined'
         if el.nodeType is 1 and el.tagName.toLowerCase! of excluded then text.push nodeText el else if el.nodeType is 3 then text.push el.data
         i++
       text.join ''
-    dt = {
-      defaults: {tblProps: {
+    @defaults= {tblProps: {
         borderWidth: '1'
         cellAttrs: []
         width: '6'
         rowAttrs: {}
         colAttrs: []
         authors: {}
-      }}
-      config: {}
-      vars: {
+    }}
+    @config= {}
+    @vars= {
         OVERHEAD_LEN_PRE: '{\uF134payload":[[\uF134'.length
         OVERHEAD_LEN_MID: '\uF134,\uF134'.length
         OVERHEAD_LEN_ROW_START: '[\uF134'.length
@@ -150,17 +148,16 @@ if typeof Datatables is 'undefined'
           'delTblCol'
           'delImg'
         ]
-      }
-      context: null
     }
-    dt.isFocused = ->
+    context: null
+    @isFocused = ->
       return false if not @context.rep.selStart or not @context.rep.selEnd
       line = @context.rep.lines.atIndex @context.rep.selStart.0
       if not line then return false
       currLineText = line.text or ''
       if (currLineText.indexOf '\uFFF9') is -1 then return false
       true
-    dt._getRowEndOffset = (rowStartOffset, tds) ->
+    @_getRowEndOffset = (rowStartOffset, tds) ->
       rowEndOffset = rowStartOffset + @vars.OVERHEAD_LEN_ROW_START
       i = 0
       len = tds.length
@@ -170,7 +167,7 @@ if typeof Datatables is 'undefined'
         rowEndOffset += tds[i].length + overHeadLen
         i++
       rowEndOffset
-    dt.getFocusedTdInfo = (payload, colStart) ->
+    @getFocusedTdInfo = (payload, colStart) ->
       payloadOffset = colStart - @vars.OVERHEAD_LEN_PRE
       rowStartOffset = 0
       payloadSum = 0
@@ -203,10 +200,10 @@ if typeof Datatables is 'undefined'
         rowStartOffset = payloadSum
         payloadSum += @vars.OVERHEAD_LEN_ROW_START
         rIndex++
-    dt.printCaretPos = (start, end) ->
+    @printCaretPos = (start, end) ->
       top.console.log JSON.stringify start
       top.console.log JSON.stringify end
-    dt.doDatatableOptions = (cmd, xByY) ->
+    @doDatatableOptions = (cmd, xByY) ->
       Datatables.context = this
       if typeof cmd is 'object' and cmd.tblPropertyChange
         Datatables.updateTableProperties cmd
@@ -228,7 +225,7 @@ if typeof Datatables is 'undefined'
           Datatables.deleteTblRow!
         case Datatables.vars.TBL_OPTIONS.7
           Datatables.deleteTblColumn!
-    dt.addTable = (tableObj) ->
+    @addTable = (tableObj) ->
       rep = @context.rep
       start = rep.selStart
       end = rep.selEnd
@@ -281,7 +278,7 @@ if typeof Datatables is 'undefined'
         @updateAuthorAndCaretPos rep.selStart.0 - rows + 1
         return 
       newText
-    dt.insertTblRow = (aboveOrBelow) ->
+    @insertTblRow = (aboveOrBelow) ->
       func = 'insertTblRow()'
       rep = @context.rep
       try
@@ -307,7 +304,7 @@ if typeof Datatables is 'undefined'
         updateEvenOddBgColor = true
         @sanitizeTblProperties rep.selStart, updateEvenOddBgColor
       catch
-    dt.deleteTable = ->
+    @deleteTable = ->
       rep = @context.rep
       func = 'deleteTable()'
       start = rep.seStart
@@ -329,7 +326,7 @@ if typeof Datatables is 'undefined'
         rep.selEnd.1 = (rep.lines.atIndex rep.selEnd.0).text.length
         @context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, ''
       catch
-    dt.deleteTblRow = ->
+    @deleteTblRow = ->
       func = 'deleteTblRow()'
       rep = @context.rep
       try
@@ -345,7 +342,7 @@ if typeof Datatables is 'undefined'
         updateEvenOddBgColor = true
         @sanitizeTblProperties rep.selStart, updateEvenOddBgColor
       catch
-    dt.updateTableProperties = (props) ->
+    @updateTableProperties = (props) ->
       rep = @context.rep
       currTd = null
       if props.tblColWidth or props.tblSingleColBgColor or props.tblColVAlign
@@ -378,7 +375,7 @@ if typeof Datatables is 'undefined'
         start.0 = rep.selStart.0
         start.1 = rep.selStart.1
         @updateTablePropertiesHelper props, start, currTd
-    dt.addCellAttr = (start, tblJSONObj, tblProperties, attrName, attrValue) ->
+    @addCellAttr = (start, tblJSONObj, tblProperties, attrName, attrValue) ->
       rep = @context.rep
       payload = tblJSONObj.payload
       currTdInfo = @getFocusedTdInfo payload, start.1
@@ -395,7 +392,7 @@ if typeof Datatables is 'undefined'
       cellAttrs[currRow] = row
       tblProperties.cellAttrs = cellAttrs
       tblProperties
-    dt.addRowAttr = (tblJSONObj, tblProperties, attrName, attrValue) ->
+    @addRowAttr = (tblJSONObj, tblProperties, attrName, attrValue) ->
       rep = @context.rep
       rowAttrs = tblProperties.rowAttrs
       if attrName is 'bgColor'
@@ -412,7 +409,7 @@ if typeof Datatables is 'undefined'
         rowAttrs[attrName] = attrValue
       tblProperties.rowAttrs = rowAttrs
       tblProperties
-    dt.addColumnAttr = (start, tblJSONObj, tblProperties, attrName, attrValue, currTd) ->
+    @addColumnAttr = (start, tblJSONObj, tblProperties, attrName, attrValue, currTd) ->
       payload = tblJSONObj.payload
       currTdInfo = @getFocusedTdInfo payload, start.1
       colAttrs = tblProperties.colAttrs
@@ -421,7 +418,7 @@ if typeof Datatables is 'undefined'
       colAttrs[currTd][attrName] = attrValue
       tblProperties.colAttrs = colAttrs
       tblProperties
-    dt.updateTablePropertiesHelper = (props, start, currTd) ->
+    @updateTablePropertiesHelper = (props, start, currTd) ->
       rep = @context.rep
       lastTblPropertyUsed = 'updateTableProperties'
       start = start or rep.selStart
@@ -465,7 +462,7 @@ if typeof Datatables is 'undefined'
             update = true
         if update then @updateTblPropInAPool -1, -1, tblProperties, start
       catch)
-    dt.updateAuthorAndCaretPos = (magicDomLineNum, tblRowNum, tblColNum) ->
+    @updateAuthorAndCaretPos = (magicDomLineNum, tblRowNum, tblColNum) ->
       rep = @context.rep
       rep.selStart.1 = rep.selEnd.1 = @vars.OVERHEAD_LEN_PRE
       rep.selStart.0 = rep.selEnd.0 = magicDomLineNum
@@ -474,7 +471,7 @@ if typeof Datatables is 'undefined'
       @updateTblPropInAPool row, col, null, rep.selStart
       rep.selStart.1 = rep.selEnd.1 = @vars.OVERHEAD_LEN_PRE
       @context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, ''
-    dt.insertTblRowBelow = (numOfRows, table) ->
+    @insertTblRowBelow = (numOfRows, table) ->
       rep = @rep
       currLineText = (rep.lines.atIndex rep.selStart.0).text
       payload = [[]]
@@ -499,7 +496,7 @@ if typeof Datatables is 'undefined'
       rep.selEnd.1 = rep.selStart.1 = currLineText.length
       @context.editorInfo.ace_doReturnKey!
       @context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, escapedJSON tableObj
-    dt.createDefaultTblProperties = (authors) ->
+    @createDefaultTblProperties = (authors) ->
       rep = @context.rep
       defTblProp = {
         borderWidth: '1'
@@ -528,7 +525,7 @@ if typeof Datatables is 'undefined'
         defTblProp.colAttrs = jsoTblProp.colAttrs
       jsoStrTblProp = JSON.stringify defTblProp
       jsoStrTblProp
-    dt.performDocApplyTblAttrToRow = (start, jsoStrTblProp) ->
+    @performDocApplyTblAttrToRow = (start, jsoStrTblProp) ->
       tempStart = []
       tempEnd = []
       tempStart.0 = start.0
@@ -536,7 +533,7 @@ if typeof Datatables is 'undefined'
       tempStart.1 = 0
       tempEnd.1 = (@context.rep.lines.atIndex start.0).text.length
       @context.editorInfo.ace_performDocumentApplyAttributesToRange tempStart, tempEnd, [['tblProp', jsoStrTblProp]]
-    dt.performDocumentTableTabKey = ->
+    @performDocumentTableTabKey = ->
       try
         context = @context
         rep = context.rep
@@ -569,15 +566,15 @@ if typeof Datatables is 'undefined'
           start = []
           start.0 = rep.selStart.0
           start.1 = rep.selStart.1
-          dt.updateTblCellAuthor 0, 0, null, start, updateEvenOddBgColor
+          @updateTblCellAuthor 0, 0, null, start, updateEvenOddBgColor
         else
           nextTdTxtLen = if typeof payload[currRow] is 'undefined' then -leftOverTdTxtLen else payload[currRow][currTd + 1].length
           payload = tblJSONObj.payload
           rep.selStart.1 = rep.selEnd.1 = rep.selEnd.1 + nextTdTxtLen + leftOverTdTxtLen
           context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, ''
-          dt.updateTblPropInAPool currRow, currTd + 1, null, rep.selStart
+          @updateTblPropInAPool currRow, currTd + 1, null, rep.selStart
       catch
-    dt.getTdInfo = (payload, tdIndex) ->
+    @getTdInfo = (payload, tdIndex) ->
       rep = @context.rep
       startOffset = @vars.OVERHEAD_LEN_PRE
       rowStartOffset = startOffset
@@ -595,7 +592,7 @@ if typeof Datatables is 'undefined'
             cellEndOffset: payloadSum
           }
         tIndex++
-    dt.getNextTdInfo = (payload, currTdInfo) ->
+    @getNextTdInfo = (payload, currTdInfo) ->
       rep = @context.rep
       startOffset = currTdInfo.rowEndOffset
       rowStartOffset = startOffset
@@ -621,7 +618,7 @@ if typeof Datatables is 'undefined'
           }
           return tdInfo
         tIndex++
-    dt.insertTblColumn = (leftOrRight, start, end) ->
+    @insertTblColumn = (leftOrRight, start, end) ->
       rep = @context.rep
       func = 'insertTblColumn()'
       try
@@ -665,7 +662,7 @@ if typeof Datatables is 'undefined'
         @sanitizeTblProperties start, updateEvenOddBgColor, updateColAttrs, currTd, 'add'
         @context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, ''
       catch
-    dt.deleteTblColumn = ->
+    @deleteTblColumn = ->
       func = 'deleteTblColumn()'
       rep = @context.rep
       try
@@ -708,7 +705,7 @@ if typeof Datatables is 'undefined'
         @sanitizeTblProperties start, updateEvenOddBgColor, updateColAttrs, currTd, 'del'
         @updateAuthorAndCaretPos rep.selStart.0, 0, 0
       catch
-    dt.insertTblRowBelow = (numOfRows, table) ->
+    @insertTblRowBelow = (numOfRows, table) ->
       context = @context
       rep = context.rep
       currLineText = (rep.lines.atIndex rep.selStart.0).text
@@ -734,7 +731,7 @@ if typeof Datatables is 'undefined'
       rep.selEnd.1 = rep.selStart.1 = currLineText.length
       @context.editorInfo.ace_inCallStackIfNecessary 'newline', @context.editorInfo.ace_doReturnKey
       context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, escapedJSON tableObj
-    dt.doReturnKey = ->
+    @doReturnKey = ->
       context = @context
       rep = context.rep
       start = rep.seStart
@@ -767,7 +764,7 @@ if typeof Datatables is 'undefined'
           context.editorInfo.ace_performDocumentReplaceRange start, end, newText
         catch
         true
-    dt.isCellDeleteOk = (keyCode) ->
+    @isCellDeleteOk = (keyCode) ->
       context = @context
       rep = context.rep
       start = rep.selStart
@@ -797,9 +794,9 @@ if typeof Datatables is 'undefined'
       catch error
         isDeleteAccepted = false)
       isDeleteAccepted
-    dt.nodeTextPlain = (n) -> n.innerText or n.textContent or n.nodeValue or ''
-    dt.toString = -> 'ep_tables'
-    dt.getLineAndCharForPoint = ->
+    @nodeTextPlain = (n) -> n.innerText or n.textContent or n.nodeValue or ''
+    @toString = -> 'ep_tables'
+    @getLineAndCharForPoint = ->
       context = @context
       point = context.point
       root = context.root
@@ -828,7 +825,7 @@ if typeof Datatables is 'undefined'
         lineEntry = @context.rep.lines.atKey n.id
         lineNum = @context.rep.lines.indexOfEntry lineEntry
         [lineNum, col]
-    dt.doDeleteKey = ->
+    @doDeleteKey = ->
       context = @context
       evt = context.evt or {}
       handled = false
@@ -881,7 +878,7 @@ if typeof Datatables is 'undefined'
             editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, ''
       line = editorInfo.ace_caretLine!
       if line isnt -1 and (editorInfo.ace_renumberList line + 1) is null then editorInfo.ace_renumberList line
-    dt.getLineTableProperty = (lineNum) ->
+    @getLineTableProperty = (lineNum) ->
       rep = @context.rep
       aline = rep.alines[lineNum]
       if aline
@@ -893,7 +890,7 @@ if typeof Datatables is 'undefined'
           catch error
             return @defaults.tblProps
       @defaults.tblProps
-    dt.updateTblPropInAPool = (row, td, jsoTblProp, start) ->
+    @updateTblPropInAPool = (row, td, jsoTblProp, start) ->
       try
         rep = @context.rep
         tblProps = void
@@ -916,7 +913,7 @@ if typeof Datatables is 'undefined'
         attrEnd.1 = (rep.lines.atIndex start.0).text.length
         editorInfo.ace_performDocumentApplyAttributesToRange attrStart, attrEnd, [['tblProp', jsoStrTblProp]]
       catch
-    dt.getCurrTblOddEvenRowBgColor = (startRowNum, currRowNum) ->
+    @getCurrTblOddEvenRowBgColor = (startRowNum, currRowNum) ->
       rowBgColors = {
         oddBgColor: null
         evenBgColor: null
@@ -927,7 +924,7 @@ if typeof Datatables is 'undefined'
         rowBgColors.evenBgColor = jsoTblProp1.'rowAttrs'.'evenBgColor' or jsoTblProp2.'rowAttrs'.'evenBgColor'
         rowBgColors.oddBgColor = jsoTblProp1.'rowAttrs'.'oddBgColor' or jsoTblProp2.'rowAttrs'.'oddBgColor'
       rowBgColors
-    dt.getTblAboveRowsFromCurFocus = (start) ->
+    @getTblAboveRowsFromCurFocus = (start) ->
       rep = @context.rep
       numOfLinesAbove = 0
       line = start.0 - 1
@@ -935,7 +932,7 @@ if typeof Datatables is 'undefined'
         numOfLinesAbove++
         line--
       numOfLinesAbove
-    dt.updateTableIndices = (tblProperties, currTd, addOrDel) ->
+    @updateTableIndices = (tblProperties, currTd, addOrDel) ->
       cellAttrs = tblProperties.cellAttrs
       rIndex = 0
       rLen = cellAttrs.length
@@ -946,7 +943,7 @@ if typeof Datatables is 'undefined'
       colAttrs = tblProperties.colAttrs
       if addOrDel is 'add' then colAttrs.splice currTd, 0, null if colAttrs else colAttrs.splice currTd, 1 if colAttrs
       tblProperties
-    dt.sanitizeTblProperties = (start, updateEvenOddBgColor, updateColAttrs, currTd, addOrDel) ->
+    @sanitizeTblProperties = (start, updateEvenOddBgColor, updateColAttrs, currTd, addOrDel) ->
       rep = @context.rep
       editorInfo = @context.editorInfo
       thisAuthor = editorInfo.ace_getAuthor!
@@ -970,7 +967,7 @@ if typeof Datatables is 'undefined'
           update = true
         if update then @updateTblPropInAPool -1, -1, jsoTblProp, tempStart
         tempStart.0 = tempStart.0 + 1
-    dt.updateTblPropInAPool = (row, td, jsoTblProp, start) ->
+    @updateTblPropInAPool = (row, td, jsoTblProp, start) ->
       try
         rep = @context.rep
         editorInfo = @context.editorInfo
@@ -993,14 +990,12 @@ if typeof Datatables is 'undefined'
         attrEnd.1 = (rep.lines.atIndex start.0).text.length
         editorInfo.ace_performDocumentApplyAttributesToRange attrStart, attrEnd, [['tblProp', jsoStrTblProp]]
       catch
-    dt.updateTblCellAuthor = (row, td, tblProperties, start, updateEvenOddBgColor) ->
+    @updateTblCellAuthor = (row, td, tblProperties, start, updateEvenOddBgColor) ->
       try
         @updateTblPropInAPool row, td, tblProperties, start
         tempStart = []
         tempStart.0 = start.0
         tempStart.1 = start.1
         @sanitizeTblProperties tempStart, updateEvenOddBgColor
-      catch
-    dt
 
-if typeof exports isnt 'undefined' then exports.Datatables = Datatables else null
+exports?Datatables = Datatables
