@@ -311,14 +311,11 @@ Datatables = (function(){
     }
     if (line) {
       currLineText = line.text;
-      if (!(currLineText.indexOf('\uFFF9') === -1)) {
-        for (;;) {
+      if (currLineText.indexOf('\uFFF9') !== -1) {
+        do {
           rep.selStart[0] = rep.selStart[0] + 1;
           currLineText = rep.lines.atIndex(rep.selStart[0]).text;
-          if (!(currLineText.indexOf('\uFFF9') !== -1)) {
-            break;
-          }
-        }
+        } while (currLineText.indexOf('\uFFF9') !== -1);
         rep.selEnd[1] = rep.selStart[1] = currLineText.length;
         this.context.editorInfo.ace_doReturnKey();
         this.context.editorInfo.ace_doReturnKey();

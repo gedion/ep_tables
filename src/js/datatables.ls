@@ -242,11 +242,11 @@ class Datatables
         return 
       if line
         currLineText = line.text
-        if not ((currLineText.indexOf '\uFFF9') is -1)
-          while true
+        if currLineText.indexOf('\uFFF9') isnt -1
+          do
             rep.selStart.0 = rep.selStart.0 + 1
             currLineText = (rep.lines.atIndex rep.selStart.0).text
-            break if not ((currLineText.indexOf '\uFFF9') isnt -1)
+          while currLineText.indexOf('\uFFF9') isnt -1
           rep.selEnd.1 = rep.selStart.1 = currLineText.length
           @context.editorInfo.ace_doReturnKey!
           @context.editorInfo.ace_doReturnKey!
