@@ -1204,36 +1204,6 @@ Datatables = (function(){
     }
     return this.defaults.tblProps;
   };
-  Datatables.updateTblPropInAPool = function(row, td, jsoTblProp, start){
-    var rep, tblProps, editorInfo, thisAuthor, authorInfos, jsoStrTblProp, attrStart, attrEnd, e;
-    try {
-      rep = this.context.rep;
-      tblProps = void 8;
-      editorInfo = this.context.editorInfo;
-      thisAuthor = editorInfo.ace_getAuthor();
-      authorInfos = editorInfo.ace_getAuthorInfos();
-      if (typeof jsoTblProp === 'undefined' || jsoTblProp == null) {
-        jsoTblProp = this.getLineTableProperty(start[0]);
-      }
-      if (row !== -1 && td !== -1) {
-        jsoTblProp['authors'][thisAuthor] = {
-          row: row,
-          cell: td,
-          colorId: authorInfos[thisAuthor].bgcolor
-        };
-      }
-      jsoStrTblProp = JSON.stringify(jsoTblProp);
-      attrStart = [];
-      attrEnd = [];
-      attrStart[0] = start[0];
-      attrStart[1] = 0;
-      attrEnd[0] = start[0];
-      attrEnd[1] = rep.lines.atIndex(start[0]).text.length;
-      return editorInfo.ace_performDocumentApplyAttributesToRange(attrStart, attrEnd, [['tblProp', jsoStrTblProp]]);
-    } catch (e$) {
-      return e = e$;
-    }
-  };
   Datatables.getCurrTblOddEvenRowBgColor = function(startRowNum, currRowNum){
     var rowBgColors, jsoTblProp1, jsoTblProp2;
     rowBgColors = {

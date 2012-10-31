@@ -890,29 +890,6 @@ class Datatables
           catch error
             return @defaults.tblProps
       @defaults.tblProps
-    @updateTblPropInAPool = (row, td, jsoTblProp, start) ->
-      try
-        rep = @context.rep
-        tblProps = void
-        editorInfo = @context.editorInfo
-        thisAuthor = editorInfo.ace_getAuthor!
-        authorInfos = editorInfo.ace_getAuthorInfos!
-        jsoTblProp = @getLineTableProperty start.0 if typeof jsoTblProp is 'undefined' or not jsoTblProp?
-        if row isnt -1 and td isnt -1
-          jsoTblProp.'authors'[thisAuthor] = {
-            row: row
-            cell: td
-            colorId: authorInfos[thisAuthor].bgcolor
-          }
-        jsoStrTblProp = JSON.stringify jsoTblProp
-        attrStart = []
-        attrEnd = []
-        attrStart.0 = start.0
-        attrStart.1 = 0
-        attrEnd.0 = start.0
-        attrEnd.1 = (rep.lines.atIndex start.0).text.length
-        editorInfo.ace_performDocumentApplyAttributesToRange attrStart, attrEnd, [['tblProp', jsoStrTblProp]]
-      catch
     @getCurrTblOddEvenRowBgColor = (startRowNum, currRowNum) ->
       rowBgColors = {
         oddBgColor: null
