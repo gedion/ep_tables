@@ -1,5 +1,5 @@
 exports.aceInitInnerdocbodyHead = (hook_name, args, cb) ->
-  args.iframeHTML.push '<link rel="stylesheet" type="text/css" href="/static/plugins/ep_tables/static/css/dataTables.css"/>'
+  args.iframeHTML.push '<link rel="stylesheet" type="text/css" href="../static/plugins/ep_tables/static/css/dataTables.css"/>'
 
 exports.postAceInit = (hook, context) ->
   $.createTableMenu = (init) ->

@@ -1,5 +1,5 @@
 exports.aceInitInnerdocbodyHead = function(hook_name, args, cb){
-  return args.iframeHTML.push('<link rel="stylesheet" type="text/css" href="/static/plugins/ep_tables/static/css/dataTables.css"/>');
+  return args.iframeHTML.push('<link rel="stylesheet" type="text/css" href="../static/plugins/ep_tables/static/css/dataTables.css"/>');
 };
 exports.postAceInit = function(hook, context){
   $.createTableMenu = function(init){
