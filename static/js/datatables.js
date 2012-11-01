@@ -972,7 +972,7 @@ Datatables = (function(){
     lastTblPropertyUsed = 'doTableReturnKey';
     currLine = rep.lines.atIndex(rep.selStart[0]);
     currLineText = currLine.text;
-    if (!(currLineText.indexOf('\uFFF9') === -1)) {
+    if (currLineText.indexOf('\uFFF9') !== -1) {
       func = 'doTableReturnKey()';
       try {
         currCarretPos = rep.selStart[1];
@@ -1082,12 +1082,10 @@ Datatables = (function(){
       }
       parNode = void 8;
       prevSib = void 8;
-      while (!((parNode = n.parentNode) === root)) {
+      while ((parNode = n.parentNode) !== root) {
         if (prevSib = n.previousSibling) {
           n = prevSib;
-          textLen = nodeText(n).length === 0
-            ? this.nodeTextPlain(n).length
-            : nodeText(n).length;
+          textLen = nodeText(n).length || this.nodeTextPlain(n).length;
           col += textLen;
         } else {
           n = parNode;

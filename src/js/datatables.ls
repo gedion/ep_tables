@@ -734,7 +734,7 @@ class Datatables
       lastTblPropertyUsed = 'doTableReturnKey'
       currLine = rep.lines.atIndex rep.selStart.0
       currLineText = currLine.text
-      if not ((currLineText.indexOf '\uFFF9') is -1)
+      if currLineText.indexOf('\uFFF9') isnt -1
         func = 'doTableReturnKey()'
         try
           currCarretPos = rep.selStart.1
@@ -804,10 +804,10 @@ class Datatables
         col = point.index if (nodeText n) or point.index > 0
         parNode = void
         prevSib = void
-        while not ((parNode = n.parentNode) is root)
+        while (parNode = n.parentNode) isnt root
           if prevSib = n.previousSibling
             n = prevSib
-            textLen = if (nodeText n).length is 0 then (@nodeTextPlain n).length else (nodeText n).length
+            textLen = nodeText(n).length or @nodeTextPlain(n).length
             col += textLen
           else
             n = parNode
