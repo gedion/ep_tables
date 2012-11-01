@@ -106,23 +106,15 @@ exports.aceKeyEvent = (hook, context) ->
   specialHandled
 
 class Datatables
-    nodeText = (n) ->
-      text = []
-      el = void
-      els = n.childNodes
-      excluded = {
+    nodeText = ({childNodes}) ->
+      excluded = do
         noscript: 'noscript'
         script: 'script'
-      }
-      i = 0
-      iLen = els.length
-      while i < iLen
-        el = els[i]
-        if el.nodeType is 1 and !(el.tagName.toLowerCase! of excluded)
-          text.push nodeText el
+      text = for el in childNodes
+        if el.nodeType is 1 and el.tagName.toLowerCase! not of excluded
+          nodeText el
         else if el.nodeType is 3
-          text.push el.data
-        i++
+          el.data
       text.join ''
     @defaults= {tblProps: {
         borderWidth: '1'
@@ -152,7 +144,7 @@ class Datatables
           'delImg'
         ]
     }
-    context: null
+    @context= null
     @isFocused = ->
       return false if not @context.rep.selStart or not @context.rep.selEnd
       line = @context.rep.lines.atIndex @context.rep.selStart.0

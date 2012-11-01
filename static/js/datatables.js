@@ -145,26 +145,23 @@ exports.aceKeyEvent = function(hook, context){
 Datatables = (function(){
   Datatables.displayName = 'Datatables';
   var nodeText, prototype = Datatables.prototype, constructor = Datatables;
-  nodeText = function(n){
-    var text, el, els, excluded, i, iLen;
-    text = [];
-    el = void 8;
-    els = n.childNodes;
+  nodeText = function(arg$){
+    var childNodes, excluded, text, res$, i$, len$, el;
+    childNodes = arg$.childNodes;
     excluded = {
       noscript: 'noscript',
       script: 'script'
     };
-    i = 0;
-    iLen = els.length;
-    while (i < iLen) {
-      el = els[i];
+    res$ = [];
+    for (i$ = 0, len$ = childNodes.length; i$ < len$; ++i$) {
+      el = childNodes[i$];
       if (el.nodeType === 1 && !(el.tagName.toLowerCase() in excluded)) {
-        text.push(nodeText(el));
+        res$.push(nodeText(el));
       } else if (el.nodeType === 3) {
-        text.push(el.data);
+        res$.push(el.data);
       }
-      i++;
     }
+    text = res$;
     return text.join('');
   };
   Datatables.defaults = {
@@ -187,7 +184,7 @@ Datatables = (function(){
     JS_KEY_CODE_DEL: 46,
     TBL_OPTIONS: ['addTbl', 'addTblRowA', 'addTblRowB', 'addTblColL', 'addTblColR', 'delTbl', 'delTblRow', 'delTblCol', 'delImg']
   };
-  prototype.context = null;
+  Datatables.context = null;
   Datatables.isFocused = function(){
     var line, currLineText;
     if (!this.context.rep.selStart || !this.context.rep.selEnd) {
