@@ -1,4 +1,4 @@
-var _, Ace2Common, Changeset, escapedJSON, fromEscapedJSON, Datatables;
+var _, Ace2Common, Changeset, escapedJSON, fromEscapedJSON, _stylesDisabled, enableStyles, disableStyles, Datatables;
 _ = require('ep_etherpad-lite/static/js/underscore');
 if (!(typeof require === 'undefined')) {
   if (typeof Ace2Common === 'undefined') {
@@ -85,13 +85,41 @@ exports.aceStartLineAndCharForPoint = function(hook, context){
   }
   return selStart;
 };
+_stylesDisabled = false;
+enableStyles = function(){
+  if (!_stylesDisabled) {
+    return;
+  }
+  $('#editbar').find('li[data-key]').each(function(){
+    var el, key;
+    el = $(this);
+    key = el.data('keyOrig');
+    return el.data('key', key).attr('data-key', key);
+  });
+  return _stylesDisabled = false;
+};
+disableStyles = function(){
+  if (_stylesDisabled) {
+    return;
+  }
+  $('#editbar').find('li[data-key]').each(function(){
+    var el, key;
+    el = $(this);
+    key = el.data('key');
+    return el.data('keyOrig', key).data('key', null).attr('data-key', '');
+  });
+  return _stylesDisabled = true;
+};
 exports.aceEndLineAndCharForPoint = function(hook, context){
   var selEndLine, error;
   selEndLine = null;
   try {
     Datatables.context = context;
     if (Datatables.isFocused()) {
+      disableStyles();
       selEndLine = Datatables.getLineAndCharForPoint();
+    } else {
+      enableStyles();
     }
   } catch (e$) {
     error = e$;

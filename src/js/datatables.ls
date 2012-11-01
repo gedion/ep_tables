@@ -66,11 +66,34 @@ exports.aceStartLineAndCharForPoint = (hook, context) ->
     top.console.log 'context rep' + Datatables.context.rep
   selStart
 
+_stylesDisabled = false
+
+enableStyles = ->
+  return unless _stylesDisabled
+  $(\#editbar)find('li[data-key]')each ->
+    el = $ @
+    key = el.data \keyOrig
+    el.data(\key, key).attr('data-key', key)
+  _stylesDisabled := false
+
+disableStyles = ->
+  return if _stylesDisabled
+  # note that pad_editbar.js uses attr, so just clearing data('key') doesn't work
+  $(\#editbar)find('li[data-key]')each ->
+    el = $ @
+    key = el.data \key
+    el.data(\keyOrig, key)data(\key, null)attr('data-key', '')
+  _stylesDisabled := true
+
 exports.aceEndLineAndCharForPoint = (hook, context) ->
   selEndLine = null
   try
     Datatables.context = context
-    selEndLine = Datatables.getLineAndCharForPoint! if Datatables.isFocused!
+    if Datatables.isFocused!
+      disableStyles!
+      selEndLine = Datatables.getLineAndCharForPoint!
+    else
+      enableStyles!
   catch error
     top.console.log 'error ' + error
     top.console.log 'context rep' + Datatables.context.rep
