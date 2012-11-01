@@ -1012,13 +1012,9 @@ Datatables = (function(){
     }
   };
   Datatables.isCellDeleteOk = function(keyCode){
-    var context, rep, start, end, currLine, currLineText, isDeleteAccepted, tblJSONObj, table, currTdInfo, cellEntryLen, currCarretPos, error;
-    context = this.context;
-    rep = context.rep;
-    start = rep.selStart;
-    end = rep.selEnd;
-    currLine = rep.lines.atIndex(rep.selStart[0]);
-    currLineText = currLine.text;
+    var rep, start, currLineText, isDeleteAccepted, tblJSONObj, table, currTdInfo, cellEntryLen, currCarretPos, error;
+    rep = this.context.rep, start = rep.selStart;
+    currLineText = rep.lines.atIndex(start[0]).text;
     if (currLineText.indexOf('\uFFF9') === -1) {
       return true;
     }
@@ -1026,9 +1022,9 @@ Datatables = (function(){
     try {
       tblJSONObj = fromEscapedJSON(currLineText);
       table = tblJSONObj.payload;
-      currTdInfo = this.getFocusedTdInfo(table, rep.selStart[1]);
+      currTdInfo = this.getFocusedTdInfo(table, start[1]);
       cellEntryLen = table[currTdInfo.row][currTdInfo.td].length;
-      currCarretPos = rep.selStart[1];
+      currCarretPos = start[1];
       if (currLineText.substring(currCarretPos - 1, currCarretPos + 2) === '\uF134,\uF134') {
         return false;
       } else {
@@ -1038,18 +1034,18 @@ Datatables = (function(){
       }
       switch (keyCode) {
       case this.vars.JS_KEY_CODE_BS:
-        if (cellEntryLen !== 0 && cellEntryLen > currTdInfo.leftOverTdTxtLen - this.vars.OVERHEAD_LEN_MID) {
+        if (cellEntryLen > 1 && cellEntryLen > currTdInfo.leftOverTdTxtLen - this.vars.OVERHEAD_LEN_MID) {
           isDeleteAccepted = true;
         }
         break;
       case this.vars.JS_KEY_CODE_DEL:
         return false;
-        if (cellEntryLen !== 0 && currTdInfo.leftOverTdTxtLen - this.vars.OVERHEAD_LEN_MID > 0) {
+        if (cellEntryLen > 0 && currTdInfo.leftOverTdTxtLen - this.vars.OVERHEAD_LEN_MID > 0) {
           isDeleteAccepted = true;
         }
         break;
       default:
-        if (cellEntryLen !== 0 && cellEntryLen > currTdInfo.leftOverTdTxtLen - this.vars.OVERHEAD_LEN_MID) {
+        if (cellEntryLen > 1 && cellEntryLen > currTdInfo.leftOverTdTxtLen - this.vars.OVERHEAD_LEN_MID) {
           isDeleteAccepted = true;
         }
       }

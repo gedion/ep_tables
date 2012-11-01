@@ -760,34 +760,30 @@ class Datatables
         catch
         true
     @isCellDeleteOk = (keyCode) ->
-      context = @context
-      rep = context.rep
-      start = rep.selStart
-      end = rep.selEnd
-      currLine = rep.lines.atIndex rep.selStart.0
-      currLineText = currLine.text
+      {selStart:start}:rep = @context.rep
+      {text:currLineText} = rep.lines.atIndex start.0
       return true if (currLineText.indexOf '\uFFF9') is -1
       isDeleteAccepted = false
-      (try
+      try
         tblJSONObj = fromEscapedJSON currLineText
         table = tblJSONObj.payload
-        currTdInfo = @getFocusedTdInfo table, rep.selStart.1
+        currTdInfo = @getFocusedTdInfo table, start.1
         cellEntryLen = table[currTdInfo.row][currTdInfo.td].length
-        currCarretPos = rep.selStart.1
+        currCarretPos = start.1
         if (currLineText.substring currCarretPos - 1, currCarretPos + 2) is '\uF134,\uF134'
           return false
         else
           if (currLineText.substring currCarretPos - 2, currCarretPos + 1) is '\uF134,\uF134' then return false
         switch keyCode
         case @vars.JS_KEY_CODE_BS
-          isDeleteAccepted = true if cellEntryLen isnt 0 and cellEntryLen > currTdInfo.leftOverTdTxtLen - @vars.OVERHEAD_LEN_MID
+          isDeleteAccepted = true if cellEntryLen > 1 and cellEntryLen > currTdInfo.leftOverTdTxtLen - @vars.OVERHEAD_LEN_MID
         case @vars.JS_KEY_CODE_DEL
-          return false
-          isDeleteAccepted = true if cellEntryLen isnt 0 and currTdInfo.leftOverTdTxtLen - @vars.OVERHEAD_LEN_MID > 0
+          return false # still buggy and can corrupt table structure
+          isDeleteAccepted = true if cellEntryLen > 0 and currTdInfo.leftOverTdTxtLen - @vars.OVERHEAD_LEN_MID > 0
         default
-          isDeleteAccepted = true if cellEntryLen isnt 0 and cellEntryLen > currTdInfo.leftOverTdTxtLen - @vars.OVERHEAD_LEN_MID
+          isDeleteAccepted = true if cellEntryLen > 1 and cellEntryLen > currTdInfo.leftOverTdTxtLen - @vars.OVERHEAD_LEN_MID
       catch error
-        isDeleteAccepted = false)
+        isDeleteAccepted = false
       isDeleteAccepted
     @nodeTextPlain = (n) -> n.innerText or n.textContent or n.nodeValue or ''
     @toString = -> 'ep_tables'
