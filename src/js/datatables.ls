@@ -28,18 +28,13 @@ exports.aceInitialized = (hook, context) ->
   editorInfo.ace_doDatatableOptions = (_ Datatables.doDatatableOptions).bind context
 
 exports.acePostWriteDomLineHTML = (hook_name, {node}, cb) ->
-  children = node.children
-  i = 0
-  while i < children.length
-    element = children[i++]
-    continue if (element.className.indexOf 'list') isnt -1 or (element.className.indexOf 'tag') isnt -1 or (element.className.indexOf 'url') isnt -1
-    lineText = element.innerText ? element.textContent
-    if lineText and (lineText.indexOf '\uFFF9') isnt -1
-      dtAttrs = if typeof exports.Datatables isnt 'undefined' then exports.Datatables.attributes else null
-      dtAttrs = dtAttrs or ''
-      code = fromEscapedJSON lineText
-      DatatablesRenderer.render {}, element, code, dtAttrs
-      exports.Datatables.attributes = null
+  lineText = node.textContent
+  if lineText and (lineText.indexOf '\uFFF9') isnt -1
+    dtAttrs = if typeof exports.Datatables isnt 'undefined' then exports.Datatables.attributes else null
+    dtAttrs = dtAttrs or ''
+    code = fromEscapedJSON lineText
+    DatatablesRenderer.render {}, node, code, dtAttrs
+    exports.Datatables.attributes = null
 
 exports.eejsBlock_scripts = (hook_name, args, cb) ->
   args.content = args.content + (require 'ep_etherpad-lite/node/eejs/').require 'ep_tables/templates/datatablesScripts.ejs'

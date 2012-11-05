@@ -32,27 +32,16 @@ exports.aceInitialized = function(hook, context){
   return editorInfo.ace_doDatatableOptions = _(Datatables.doDatatableOptions).bind(context);
 };
 exports.acePostWriteDomLineHTML = function(hook_name, arg$, cb){
-  var node, children, i, element, lineText, ref$, dtAttrs, code, results$ = [];
+  var node, lineText, dtAttrs, code;
   node = arg$.node;
-  children = node.children;
-  i = 0;
-  while (i < children.length) {
-    element = children[i++];
-    if (element.className.indexOf('list') !== -1 || element.className.indexOf('tag') !== -1 || element.className.indexOf('url') !== -1) {
-      continue;
-    }
-    lineText = (ref$ = element.innerText) != null
-      ? ref$
-      : element.textContent;
-    if (lineText && lineText.indexOf('\uFFF9') !== -1) {
-      dtAttrs = typeof exports.Datatables !== 'undefined' ? exports.Datatables.attributes : null;
-      dtAttrs = dtAttrs || '';
-      code = fromEscapedJSON(lineText);
-      DatatablesRenderer.render({}, element, code, dtAttrs);
-      results$.push(exports.Datatables.attributes = null);
-    }
+  lineText = node.textContent;
+  if (lineText && lineText.indexOf('\uFFF9') !== -1) {
+    dtAttrs = typeof exports.Datatables !== 'undefined' ? exports.Datatables.attributes : null;
+    dtAttrs = dtAttrs || '';
+    code = fromEscapedJSON(lineText);
+    DatatablesRenderer.render({}, node, code, dtAttrs);
+    return exports.Datatables.attributes = null;
   }
-  return results$;
 };
 exports.eejsBlock_scripts = function(hook_name, args, cb){
   return args.content = args.content + require('ep_etherpad-lite/node/eejs/').require('ep_tables/templates/datatablesScripts.ejs');
