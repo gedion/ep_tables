@@ -648,38 +648,6 @@ Datatables = (function(){
     rep.selStart[1] = rep.selEnd[1] = this.vars.OVERHEAD_LEN_PRE;
     return this.context.editorInfo.ace_performDocumentReplaceRange(rep.selStart, rep.selEnd, '');
   };
-  Datatables.insertTblRowBelow = function(numOfRows, table){
-    var rep, currLineText, payload, tblPayload, tblRows, i, tableObj;
-    rep = this.rep;
-    currLineText = rep.lines.atIndex(rep.selStart[0]).text;
-    payload = [[]];
-    if (!numOfRows && numOfRows !== 0) {
-      tblPayload = fromEscapedJSON(currLineText).payload;
-      numOfRows = tblPayload[0].length;
-    }
-    tblRows = new Array(numOfRows);
-    if (!(numOfRows === 0)) {
-      i = 0;
-      while (i < tblRows.length) {
-        tblRows[i] = ' ';
-        i++;
-      }
-    }
-    payload = [tblRows];
-    if (table) {
-      payload = table.payload;
-    }
-    tableObj = {
-      payload: payload,
-      tblId: 1,
-      tblClass: '\uFFF9',
-      trClass: 'alst',
-      tdClass: 'hide-el'
-    };
-    rep.selEnd[1] = rep.selStart[1] = currLineText.length;
-    this.context.editorInfo.ace_doReturnKey();
-    return this.context.editorInfo.ace_performDocumentReplaceRange(rep.selStart, rep.selEnd, escapedJSON(tableObj));
-  };
   Datatables.createDefaultTblProperties = function(authors){
     var rep, defTblProp, prevLine, jsoTblProp, prevLineText, nextLine, nextLineText, jsoStrTblProp;
     rep = this.context.rep;

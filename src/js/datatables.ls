@@ -484,31 +484,6 @@ class Datatables
       @updateTblPropInAPool row, col, null, rep.selStart
       rep.selStart.1 = rep.selEnd.1 = @vars.OVERHEAD_LEN_PRE
       @context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, ''
-    @insertTblRowBelow = (numOfRows, table) ->
-      rep = @rep
-      currLineText = (rep.lines.atIndex rep.selStart.0).text
-      payload = [[]]
-      if not numOfRows and numOfRows isnt 0
-        tblPayload = (fromEscapedJSON currLineText).payload
-        numOfRows = tblPayload.0.length
-      tblRows = new Array numOfRows
-      if not (numOfRows is 0)
-        i = 0
-        while i < tblRows.length
-          tblRows[i] = ' '
-          i++
-      payload = [tblRows]
-      if table then payload = table.payload
-      tableObj = {
-        payload: payload
-        tblId: 1
-        tblClass: '\uFFF9'
-        trClass: 'alst'
-        tdClass: 'hide-el'
-      }
-      rep.selEnd.1 = rep.selStart.1 = currLineText.length
-      @context.editorInfo.ace_doReturnKey!
-      @context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, escapedJSON tableObj
     @createDefaultTblProperties = (authors) ->
       rep = @context.rep
       defTblProp = {
