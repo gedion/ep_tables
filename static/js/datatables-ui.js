@@ -567,7 +567,6 @@ exports.postAceInit = function(hook, context){
         zindex: 500,
         shadow: false,
         position: 'dynamic',
-        keepopen: true,
         clicktohide: true
       });
       $.tblContextMenu.addItems([
@@ -622,6 +621,7 @@ exports.postAceInit = function(hook, context){
         context.ace.callWithAce(function(ace){
           return ace.ace_doDatatableOptions('addTbl', 'addTblX' + $('#select_matrix').text());
         }, 'tblOptions', true);
+        $.tblContextMenu.hide();
         return false;
       });
       $.tblContextMenu.subscribe('click', function(p_sType, p_aArgs){
@@ -666,6 +666,7 @@ exports.postAceInit = function(hook, context){
           context.ace.callWithAce(function(ace){
             return ace.ace_doDatatableOptions(id);
           }, 'tblOptions', true);
+          $.tblContextMenu.hide();
           return false;
         }
       });

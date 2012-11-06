@@ -417,7 +417,6 @@ exports.postAceInit = (hook, context) ->
         zindex: 500
         shadow: false
         position: 'dynamic'
-        keepopen: true
         clicktohide: true
       }
       $.tblContextMenu.addItems [
@@ -463,6 +462,7 @@ exports.postAceInit = (hook, context) ->
         ($ '#select_matrix').html xVal + ' X ' + yVal)
       ($ 'td', '#matrix_table').click ((e) ->
         context.ace.callWithAce ((ace) -> ace.ace_doDatatableOptions 'addTbl', 'addTblX' + ($ '#select_matrix').text!), 'tblOptions', true
+        $.tblContextMenu.hide!
         false)
       $.tblContextMenu.subscribe 'click', (p_sType, p_aArgs) ->
         oEvent = p_aArgs.0
@@ -492,6 +492,7 @@ exports.postAceInit = (hook, context) ->
           case 'Delete Column'
             id = 'delTblCol'
           context.ace.callWithAce ((ace) -> ace.ace_doDatatableOptions id), 'tblOptions', true
+          $.tblContextMenu.hide!
           false
     if not init
       $.alignMenu $.tblContextMenu, 'tbl-menu'
