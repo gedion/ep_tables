@@ -82,7 +82,9 @@ class DatatablesRenderer
               k = 0
               while k < tdText.length
                 if k < tdText.length - 1
-                  cellsWithBr += tdText[k] + '<span value=\'tblBreak\' contenteditable="false" class=\'hide-el\'>/r/n</span><label class=\'tblBreak\'></label>'
+                  cellsWithBr += tdText[k] + "<span value='tblBreak'#{
+                    if $.browser.msie and $.browser.version <= 7 then " contenteditable='false'" else ""
+                  } class='hide-el'>/r/n</span><label class='tblBreak'></label>"
                 else
                   cellsWithBr += tdText[k]
                 k++
