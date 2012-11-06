@@ -1,5 +1,8 @@
 .hide-el{
 	display:none;
+        *position: absolute;
+        *top: -10000px;
+        *display: block;
 }
 .tblBreak{
 	display:block;

@@ -82,7 +82,7 @@ class DatatablesRenderer
               k = 0
               while k < tdText.length
                 if k < tdText.length - 1
-                  cellsWithBr += tdText[k] + '<label value=\'tblBreak\' class=\'hide-el\'>/r/n</label><label class=\'tblBreak\'></label>'
+                  cellsWithBr += tdText[k] + '<span value=\'tblBreak\' contenteditable="false" class=\'hide-el\'>/r/n</span><label class=\'tblBreak\'></label>'
                 else
                   cellsWithBr += tdText[k]
                 k++
