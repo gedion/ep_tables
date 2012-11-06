@@ -34,7 +34,7 @@ exports.aceInitialized = function(hook, context){
 exports.acePostWriteDomLineHTML = function(hook_name, arg$, cb){
   var node, lineText, dtAttrs, code, ref$, ref1$;
   node = arg$.node;
-  lineText = node.textContent;
+  lineText = $(node).text();
   if (lineText && lineText.indexOf('\uFFF9') !== -1) {
     dtAttrs = typeof exports.Datatables !== 'undefined' ? exports.Datatables.attributes : null;
     dtAttrs = dtAttrs || '';

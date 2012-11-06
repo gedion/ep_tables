@@ -28,7 +28,7 @@ exports.aceInitialized = (hook, context) ->
   editorInfo.ace_doDatatableOptions = (_ Datatables.doDatatableOptions).bind context
 
 exports.acePostWriteDomLineHTML = (hook_name, {node}, cb) ->
-  lineText = node.textContent
+  lineText = $(node)text!
   if lineText and (lineText.indexOf '\uFFF9') isnt -1
     dtAttrs = if typeof exports.Datatables isnt 'undefined' then exports.Datatables.attributes else null
     dtAttrs = dtAttrs or ''
