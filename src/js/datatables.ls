@@ -34,6 +34,7 @@ exports.acePostWriteDomLineHTML = (hook_name, {node}, cb) ->
     dtAttrs = dtAttrs or ''
     code = fromEscapedJSON lineText
     DatatablesRenderer.render {}, node, code, dtAttrs
+    exports.Datatables.lastTblId >?= code.tblId
     exports.Datatables.attributes = null
 
 exports.eejsBlock_scripts = (hook_name, args, cb) ->
@@ -285,8 +286,9 @@ class Datatables
         jsoStrTblProp = JSON.stringify @createDefaultTblProperties!
         authors = {}
         i = 0
+        table = {}
         while i < rows
-          @insertTblRowBelow cols
+          @insertTblRowBelow cols, table
           if i is 0 then @performDocApplyTblAttrToRow rep.selStart, @createDefaultTblProperties! else @performDocApplyTblAttrToRow rep.selStart, @createDefaultTblProperties authors
           i++
         @updateAuthorAndCaretPos rep.selStart.0 - rows + 1
@@ -298,7 +300,7 @@ class Datatables
       try
         newText = ''
         currLineText = (rep.lines.atIndex rep.selStart.0).text
-        payload = (fromEscapedJSON currLineText).payload
+        {payload,tblId} = (fromEscapedJSON currLineText)
         currTdInfo = @getFocusedTdInfo payload, rep.selStart.1
         currRow = currTdInfo.row
         lastRowOffSet = 0
@@ -310,9 +312,9 @@ class Datatables
         end.1 = rep.selStart.1
         if aboveOrBelow is 'addA'
           rep.selStart.0 = rep.selEnd.0 = rep.selStart.0 - 1
-          @insertTblRowBelow payload.0.length
+          @insertTblRowBelow payload.0.length, {tblId}
         else
-          @insertTblRowBelow payload.0.length
+          @insertTblRowBelow payload.0.length, {tblId}
         @context.editorInfo.ace_performDocApplyTblAttrToRow rep.selStart, @createDefaultTblProperties!
         @updateAuthorAndCaretPos rep.selStart.0
         updateEvenOddBgColor = true
@@ -540,7 +542,7 @@ class Datatables
           nextLineText = nextLine.text
           updateEvenOddBgColor = false
           if not nextLineText? or nextLineText is '' or (nextLineText.indexOf '\uFFF9') is -1
-            @insertTblRowBelow null, null
+            @insertTblRowBelow null, {tblJSONObj.tblId}
             @performDocApplyTblAttrToRow rep.selStart, @createDefaultTblProperties!
             rep.selEnd.1 = rep.selStart.1 = @vars.OVERHEAD_LEN_PRE
             updateEvenOddBgColor = true
@@ -708,15 +710,16 @@ class Datatables
         while i < tblRows.length
           tblRows[i] = ' '
           i++
-      payload = [tblRows]
-      if table then payload = table.payload
+      payload = table?payload ? [tblRows]
+      tblId = table?tblId ? @getNewTblId!
       tableObj = {
-        payload: payload
-        tblId: table?tblId ? @getNewTblId!
+        payload
+        tblId
         tblClass: '\uFFF9'
         trClass: 'alst'
         tdClass: 'hide-el'
       }
+      table?tblId = tblId
       rep.selEnd.1 = rep.selStart.1 = currLineText.length
       @context.editorInfo.ace_inCallStackIfNecessary 'newline', @context.editorInfo.ace_doReturnKey
       context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, escapedJSON tableObj
@@ -890,9 +893,14 @@ class Datatables
       rowBgColors
     @getTblAboveRowsFromCurFocus = (start) ->
       rep = @context.rep
-      numOfLinesAbove = 0
-      line = start.0 - 1
-      while not (((rep.lines.atIndex line).text.indexOf '\uFFF9') is -1)
+      numOfLinesAbove = -1
+      line = start.0
+      tblId = null
+      while text = rep.lines.atIndex(line).text
+        break unless text is /\uFFF9/
+        curr = fromEscapedJSON(text).tblId
+        tblId ?= curr
+        break if curr != tblId
         numOfLinesAbove++
         line--
       numOfLinesAbove

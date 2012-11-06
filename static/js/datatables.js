@@ -32,7 +32,7 @@ exports.aceInitialized = function(hook, context){
   return editorInfo.ace_doDatatableOptions = _(Datatables.doDatatableOptions).bind(context);
 };
 exports.acePostWriteDomLineHTML = function(hook_name, arg$, cb){
-  var node, lineText, dtAttrs, code;
+  var node, lineText, dtAttrs, code, ref$, ref1$;
   node = arg$.node;
   lineText = node.textContent;
   if (lineText && lineText.indexOf('\uFFF9') !== -1) {
@@ -40,6 +40,7 @@ exports.acePostWriteDomLineHTML = function(hook_name, arg$, cb){
     dtAttrs = dtAttrs || '';
     code = fromEscapedJSON(lineText);
     DatatablesRenderer.render({}, node, code, dtAttrs);
+    (ref$ = exports.Datatables).lastTblId >= (ref1$ = code.tblId) || (ref$.lastTblId = ref1$);
     return exports.Datatables.attributes = null;
   }
 };
@@ -360,8 +361,9 @@ Datatables = (function(){
       jsoStrTblProp = JSON.stringify(this.createDefaultTblProperties());
       authors = {};
       i = 0;
+      table = {};
       while (i < rows) {
-        this.insertTblRowBelow(cols);
+        this.insertTblRowBelow(cols, table);
         if (i === 0) {
           this.performDocApplyTblAttrToRow(rep.selStart, this.createDefaultTblProperties());
         } else {
@@ -375,13 +377,13 @@ Datatables = (function(){
     return newText;
   };
   Datatables.insertTblRow = function(aboveOrBelow){
-    var func, rep, newText, currLineText, payload, currTdInfo, currRow, lastRowOffSet, start, end, updateEvenOddBgColor, e;
+    var func, rep, newText, currLineText, ref$, payload, tblId, currTdInfo, currRow, lastRowOffSet, start, end, updateEvenOddBgColor, e;
     func = 'insertTblRow()';
     rep = this.context.rep;
     try {
       newText = '';
       currLineText = rep.lines.atIndex(rep.selStart[0]).text;
-      payload = fromEscapedJSON(currLineText).payload;
+      ref$ = fromEscapedJSON(currLineText), payload = ref$.payload, tblId = ref$.tblId;
       currTdInfo = this.getFocusedTdInfo(payload, rep.selStart[1]);
       currRow = currTdInfo.row;
       lastRowOffSet = 0;
@@ -393,9 +395,13 @@ Datatables = (function(){
       end[1] = rep.selStart[1];
       if (aboveOrBelow === 'addA') {
         rep.selStart[0] = rep.selEnd[0] = rep.selStart[0] - 1;
-        this.insertTblRowBelow(payload[0].length);
+        this.insertTblRowBelow(payload[0].length, {
+          tblId: tblId
+        });
       } else {
-        this.insertTblRowBelow(payload[0].length);
+        this.insertTblRowBelow(payload[0].length, {
+          tblId: tblId
+        });
       }
       this.context.editorInfo.ace_performDocApplyTblAttrToRow(rep.selStart, this.createDefaultTblProperties());
       this.updateAuthorAndCaretPos(rep.selStart[0]);
@@ -719,7 +725,9 @@ Datatables = (function(){
         nextLineText = nextLine.text;
         updateEvenOddBgColor = false;
         if (nextLineText == null || nextLineText === '' || nextLineText.indexOf('\uFFF9') === -1) {
-          this.insertTblRowBelow(null, null);
+          this.insertTblRowBelow(null, {
+            tblId: tblJSONObj.tblId
+          });
           this.performDocApplyTblAttrToRow(rep.selStart, this.createDefaultTblProperties());
           rep.selEnd[1] = rep.selStart[1] = this.vars.OVERHEAD_LEN_PRE;
           updateEvenOddBgColor = true;
@@ -917,7 +925,7 @@ Datatables = (function(){
     }
   };
   Datatables.insertTblRowBelow = function(numOfRows, table){
-    var context, rep, currLineText, payload, tblPayload, tblRows, i, tableObj, ref$;
+    var context, rep, currLineText, payload, tblPayload, tblRows, i, ref$, tblId, tableObj;
     context = this.context;
     rep = context.rep;
     currLineText = rep.lines.atIndex(rep.selStart[0]).text;
@@ -934,19 +942,22 @@ Datatables = (function(){
         i++;
       }
     }
-    payload = [tblRows];
-    if (table) {
-      payload = table.payload;
-    }
+    payload = (ref$ = table != null ? table.payload : void 8) != null
+      ? ref$
+      : [tblRows];
+    tblId = (ref$ = table != null ? table.tblId : void 8) != null
+      ? ref$
+      : this.getNewTblId();
     tableObj = {
       payload: payload,
-      tblId: (ref$ = table != null ? table.tblId : void 8) != null
-        ? ref$
-        : this.getNewTblId(),
+      tblId: tblId,
       tblClass: '\uFFF9',
       trClass: 'alst',
       tdClass: 'hide-el'
     };
+    if (table != null) {
+      table.tblId = tblId;
+    }
     rep.selEnd[1] = rep.selStart[1] = currLineText.length;
     this.context.editorInfo.ace_inCallStackIfNecessary('newline', this.context.editorInfo.ace_doReturnKey);
     return context.editorInfo.ace_performDocumentReplaceRange(rep.selStart, rep.selEnd, escapedJSON(tableObj));
@@ -1197,11 +1208,20 @@ Datatables = (function(){
     return rowBgColors;
   };
   Datatables.getTblAboveRowsFromCurFocus = function(start){
-    var rep, numOfLinesAbove, line;
+    var rep, numOfLinesAbove, line, tblId, text, curr;
     rep = this.context.rep;
-    numOfLinesAbove = 0;
-    line = start[0] - 1;
-    while (!(rep.lines.atIndex(line).text.indexOf('\uFFF9') === -1)) {
+    numOfLinesAbove = -1;
+    line = start[0];
+    tblId = null;
+    while (text = rep.lines.atIndex(line).text) {
+      if (!/\uFFF9/.test(text)) {
+        break;
+      }
+      curr = fromEscapedJSON(text).tblId;
+      tblId == null && (tblId = curr);
+      if (curr !== tblId) {
+        break;
+      }
       numOfLinesAbove++;
       line--;
     }
