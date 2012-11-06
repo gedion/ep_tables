@@ -90,7 +90,7 @@ class DatatablesRenderer
             else
               htmlTbl += '<td name=\'tData\' ' + colVAlign + ' style=\'' + printViewTblTDStyles + cellStyles + lastCellBorder + ' border-left:' + tblBorderWidth + 'px solid ' + tblBorderColor + authorBorderColor + borderTop + '\' >' + tds[i] + '' + '<br value=\'tblBreak\'></td>' + delimCell
             i++
-          bracketAndcomma = '\uF134]],\uF134tblId\uF134:\uF1341\uF134,\uF134tblClass\uF134:\uF134\uFFF9\uF134}'
+          bracketAndcomma = '\uF134]],\uF134tblId\uF134:\uF134' + tblId + '\uF134,\uF134tblClass\uF134:\uF134\uFFF9\uF134}'
           htmlTbl += '<td name=\'bracketAndcomma\' class=\'  hide-el overhead\'>' + bracketAndcomma + '</td>'
           htmlTbl += '</tr>'
           j++

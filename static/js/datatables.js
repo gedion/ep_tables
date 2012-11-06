@@ -181,6 +181,7 @@ Datatables = (function(){
     text = res$;
     return text.join('');
   };
+  Datatables.lastTblId = 0;
   Datatables.defaults = {
     tblProps: {
       borderWidth: '1',
@@ -916,7 +917,7 @@ Datatables = (function(){
     }
   };
   Datatables.insertTblRowBelow = function(numOfRows, table){
-    var context, rep, currLineText, payload, tblPayload, tblRows, i, tableObj;
+    var context, rep, currLineText, payload, tblPayload, tblRows, i, tableObj, ref$;
     context = this.context;
     rep = context.rep;
     currLineText = rep.lines.atIndex(rep.selStart[0]).text;
@@ -939,7 +940,9 @@ Datatables = (function(){
     }
     tableObj = {
       payload: payload,
-      tblId: 1,
+      tblId: (ref$ = table != null ? table.tblId : void 8) != null
+        ? ref$
+        : this.getNewTblId(),
       tblClass: '\uFFF9',
       trClass: 'alst',
       tdClass: 'hide-el'
@@ -947,6 +950,9 @@ Datatables = (function(){
     rep.selEnd[1] = rep.selStart[1] = currLineText.length;
     this.context.editorInfo.ace_inCallStackIfNecessary('newline', this.context.editorInfo.ace_doReturnKey);
     return context.editorInfo.ace_performDocumentReplaceRange(rep.selStart, rep.selEnd, escapedJSON(tableObj));
+  };
+  Datatables.getNewTblId = function(){
+    return ++this.lastTblId;
   };
   Datatables.doReturnKey = function(){
     var context, rep, start, end, lastTblPropertyUsed, currLine, currLineText, func, currCarretPos, newText, jsonObj, payloadStr, error, e;

@@ -8,9 +8,10 @@ exports.collectContentLineBreak = function(hook, context){
   return breakLine;
 };
 exports.collectContentLineText = function(hook, context){
-  var n, txt, elementName;
+  var n, txt, tblId, elementName;
   n = context.node;
   txt = context.text;
+  tblId = 1;
   if (txt) {
     while (n) {
       if (n.tagName === 'TD') {
@@ -27,7 +28,7 @@ exports.collectContentLineText = function(hook, context){
               break;
             } else {
               if (elementName === 'bracketAndcomma') {
-                txt = '\uF134]],\uF134tblId\uF134:\uF1341\uF134,\uF134tblClass\uF134:\uF134\uFFF9\uF134}';
+                txt = '\uF134]],\uF134tblId\uF134:\uF134' + tblId(+'\uF134,\uF134tblClass\uF134:\uF134\uFFF9\uF134}');
                 break;
               }
             }

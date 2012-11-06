@@ -134,6 +134,7 @@ class Datatables
         else if el.nodeType is 3
           el.data
       text.join ''
+    @lastTblId = 0
     @defaults= {tblProps: {
         borderWidth: '1'
         cellAttrs: []
@@ -711,7 +712,7 @@ class Datatables
       if table then payload = table.payload
       tableObj = {
         payload: payload
-        tblId: 1
+        tblId: table?tblId ? @getNewTblId!
         tblClass: '\uFFF9'
         trClass: 'alst'
         tdClass: 'hide-el'
@@ -719,6 +720,8 @@ class Datatables
       rep.selEnd.1 = rep.selStart.1 = currLineText.length
       @context.editorInfo.ace_inCallStackIfNecessary 'newline', @context.editorInfo.ace_doReturnKey
       context.editorInfo.ace_performDocumentReplaceRange rep.selStart, rep.selEnd, escapedJSON tableObj
+    @getNewTblId = ->
+        ++@lastTblId
     @doReturnKey = ->
       context = @context
       rep = context.rep
