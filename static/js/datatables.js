@@ -209,7 +209,11 @@ Datatables = (function(){
     if (!this.context.rep.selStart || !this.context.rep.selEnd) {
       return false;
     }
-    line = this.context.rep.lines.atIndex(this.context.rep.selStart[0]);
+    line = (function(){
+      try {
+        return this.context.rep.lines.atIndex(this.context.rep.selStart[0]);
+      } catch (e$) {}
+    }.call(this));
     if (!line) {
       return false;
     }

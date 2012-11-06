@@ -167,7 +167,7 @@ class Datatables
     @context= null
     @isFocused = ->
       return false if not @context.rep.selStart or not @context.rep.selEnd
-      line = @context.rep.lines.atIndex @context.rep.selStart.0
+      line = try @context.rep.lines.atIndex @context.rep.selStart.0
       if not line then return false
       currLineText = line.text or ''
       if (currLineText.indexOf '\uFFF9') is -1 then return false
