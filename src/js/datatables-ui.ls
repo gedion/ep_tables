@@ -439,11 +439,6 @@ exports.postAceInit = (hook, context) ->
           'Delete Column'
           'Delete Table'
         ]
-        [{
-          id: 'tbl_prop_menu_item'
-          text: 'Table Properties'
-          onclick: {fn: showTblPropPanel}
-        }]
       ]
       subMenus = $.tblContextMenu.getSubmenus!
       subMenus.0.setFooter matrixTable

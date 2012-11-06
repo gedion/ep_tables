@@ -577,13 +577,7 @@ exports.postAceInit = function(hook, context){
             id: 'tbl_insert',
             itemData: ['<div id=\'select_matrix\'>0 X 0</div>']
           }
-        }], ['Insert Row Above', 'Insert Row Below', 'Insert Column Right', 'Insert Column Left'], ['Delete Row', 'Delete Column', 'Delete Table'], [{
-          id: 'tbl_prop_menu_item',
-          text: 'Table Properties',
-          onclick: {
-            fn: showTblPropPanel
-          }
-        }]
+        }], ['Insert Row Above', 'Insert Row Below', 'Insert Column Right', 'Insert Column Left'], ['Delete Row', 'Delete Column', 'Delete Table']
       ]);
       subMenus = $.tblContextMenu.getSubmenus();
       subMenus[0].setFooter(matrixTable);
