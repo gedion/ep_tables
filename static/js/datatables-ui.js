@@ -31,8 +31,8 @@ exports.postAceInit = function(hook, context){
           showhexsummary: false,
           showhexcontrols: true,
           images: {
-            PICKER_THUMB: 'http://yui.yahooapis.com/2.9.0/build/colorpicker/assets/picker_thumb.png',
-            HUE_THUMB: 'http://yui.yahooapis.com/2.9.0/build/colorpicker/assets/hue_thumb.png'
+            PICKER_THUMB: 'https://raw.github.com/yui/yui2/master/build/colorpicker/assets/picker_thumb.png',
+            HUE_THUMB: 'https://raw.github.com/yui/yui2/master/build/colorpicker/assets/hue_thumb.png'
           }
         });
         $.oColorPicker.on('rgbChange', colorPickerButtonClick);
