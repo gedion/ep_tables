@@ -772,10 +772,11 @@ class Datatables
         if (currLineText.substring currCarretPos - 1, currCarretPos + 2) is '\uF134,\uF134'
           return false
         else
-          if (currLineText.substring currCarretPos - 2, currCarretPos + 1) is '\uF134,\uF134' then return false
+          if (currLineText.substring currCarretPos - 2, currCarretPos + 1) is '\uF134,\uF134'
+            return false
         switch keyCode
         case @vars.JS_KEY_CODE_BS
-          isDeleteAccepted = true if cellEntryLen > 1 and cellEntryLen > currTdInfo.leftOverTdTxtLen - @vars.OVERHEAD_LEN_MID
+          isDeleteAccepted = true if cellEntryLen > 0 and cellEntryLen > currTdInfo.leftOverTdTxtLen - @vars.OVERHEAD_LEN_MID
         case @vars.JS_KEY_CODE_DEL
           return false # still buggy and can corrupt table structure
           isDeleteAccepted = true if cellEntryLen > 0 and currTdInfo.leftOverTdTxtLen - @vars.OVERHEAD_LEN_MID > 0
