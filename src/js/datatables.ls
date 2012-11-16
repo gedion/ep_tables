@@ -10,7 +10,7 @@ escapedJSON = ->
         if _1
           String.fromCharCode parseInt _1, 16
         else
-          "\\"+_1.charCodeAt(0)+\;
+          "\\"+_2.charCodeAt(0)+\;
     .replace /"/g        '\uF134'
     .replace /\\(\d+);/g (_, _1) -> "\\"+String.fromCharCode(_1)
   #console.log ret

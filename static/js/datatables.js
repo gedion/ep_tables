@@ -14,7 +14,7 @@ escapedJSON = function(it){
     if (_1) {
       return String.fromCharCode(parseInt(_1, 16));
     } else {
-      return "\\" + _1.charCodeAt(0) + ';';
+      return "\\" + _2.charCodeAt(0) + ';';
     }
   }).replace(/"/g, '\uF134').replace(/\\(\d+);/g, function(_, _1){
     return "\\" + String.fromCharCode(_1);
@@ -1040,7 +1040,7 @@ Datatables = (function(){
       }
       switch (keyCode) {
       case this.vars.JS_KEY_CODE_BS:
-        if (cellEntryLen > 1 && cellEntryLen > currTdInfo.leftOverTdTxtLen - this.vars.OVERHEAD_LEN_MID) {
+        if (cellEntryLen > 0 && cellEntryLen > currTdInfo.leftOverTdTxtLen - this.vars.OVERHEAD_LEN_MID) {
           isDeleteAccepted = true;
         }
         break;
