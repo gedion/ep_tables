@@ -1,35 +1,42 @@
-exports.collectContentLineBreak = function (hook, context) {
-    var tvalue = context.tvalue;
-    var breakLine = true;
-    if (tvalue && tvalue == 'tblBreak') {
-       breakLine = false;
-    }
-    return breakLine;
+exports.collectContentLineBreak = function(hook, context){
+  var tvalue, breakLine;
+  tvalue = context.tvalue;
+  breakLine = true;
+  if (tvalue && tvalue === 'tblBreak') {
+    breakLine = false;
+  }
+  return breakLine;
 };
-exports.collectContentLineText= function (hook, context) {
-    var n = context.node;
-    var txt = context.text;
-    if (txt) {
-        while (n) {
-            if (n.tagName == 'TD') {
-                var elementName = n.getAttribute("name");
-                if (elementName == 'tData') {
-                    txt = txt.replace(/\\/g, "|");
-                    txt = txt.replace(/"/g, "'");
-                    break;
-                } else if (elementName == 'delimCell') {
-                    txt = '","';
-                    break;
-                } else if (elementName == 'payload') {
-                    txt = "{\"payload\":[[\"";
-                    break;
-                } else if (elementName == 'bracketAndcomma') {
-                    txt = "\"]],\"tblId\":\"1\",\"tblClass\":\"data-tables\"}";
-                    break;
-                }
+exports.collectContentLineText = function(hook, context){
+  var n, txt, tblId, elementName;
+  n = context.node;
+  txt = context.text;
+  tblId = 1;
+  if (txt) {
+    while (n) {
+      if (n.tagName === 'TD') {
+        elementName = n.getAttribute('name');
+        if (elementName === 'tData') {
+          break;
+        } else {
+          if (elementName === 'delimCell') {
+            txt = '\uF134,\uF134';
+            break;
+          } else {
+            if (elementName === 'payload') {
+              txt = '{\uF134payload\uF134:[[\uF134';
+              break;
+            } else {
+              if (elementName === 'bracketAndcomma') {
+                txt = "\uF134]],\uF134tblId\uF134:\uF134" + tblId + "\uF134,\uF134tblClass\uF134:\uF134\uFFF9\uF134}";
+                break;
+              }
             }
-            n = n.parentNode;
+          }
         }
+      }
+      n = n.parentNode;
     }
-    return txt;
+  }
+  return txt;
 };

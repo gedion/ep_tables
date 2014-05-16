@@ -9,7 +9,7 @@
 
 		},
 		"client_hooks" : {			
-			"aceInitInnerdocbodyHead": "ep_tables/static/js/datatables:aceInitInnerdocbodyHead",
+			"aceInitInnerdocbodyHead": "ep_tables/static/js/datatables-ui.js:aceInitInnerdocbodyHead",
 		 	"collectContentLineBreak": "ep_tables/static/js/contentcollector:collectContentLineBreak",
 		 	"collectContentLineText": "ep_tables/static/js/contentcollector:collectContentLineText",
 			"aceKeyEvent": "ep_tables/static/js/datatables.js:aceKeyEvent",
@@ -18,7 +18,7 @@
 			"aceAttribsToClasses": "ep_tables/static/js/datatables.js:aceAttribsToClasses",
 			"acePostWriteDomLineHTML": "ep_tables/static/js/datatables:acePostWriteDomLineHTML",
 			"aceInitialized": "ep_tables/static/js/datatables:aceInitialized",
-			"postAceInit": "ep_tables/static/js/datatables:postAceInit",
+			"postAceInit": "ep_tables/static/js/datatables-ui.js:postAceInit",
 			"disableAuthorColorsForThisLine": "ep_tables/static/js/linestylefilter:disableAuthorColorsForThisLine"
 				
 		}
